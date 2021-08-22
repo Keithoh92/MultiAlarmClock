@@ -12,15 +12,24 @@ import com.example.multialarmclock.R
 import android.graphics.drawable.Drawable
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 
 class MainActivity : AppCompatActivity() {
     var settings: ImageButton? = null
     var avd: AnimatedVectorDrawableCompat? = null
     var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
-    var imageButtonTopLeft: AppCompatButton? = null
-    var imageButtonTopRight: AppCompatButton? = null
+//    var imageButtonTopLeft: AppCompatButton? = null
+//    var imageButtonTopRight: AppCompatButton? = null
+    var cardviewTopLeft: CardView? = null
+    var cardviewTopRight: CardView? = null
+    var cardviewTopLeftHeader: TextView? = null
+    var cardviewTopRightHeader: TextView? = null
+    var cardviewSetButton: AppCompatButton? = null
+    var cardviewEditButton: AppCompatButton? = null
+
     private var menu: Menu? = null
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +38,15 @@ class MainActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
 
-        imageButtonTopLeft = findViewById(R.id.topLeftImageButton)
-        imageButtonTopRight = findViewById(R.id.topRightImageButton)
+        cardviewTopLeft = findViewById(R.id.cardview_top_left)
+        cardviewTopRight = findViewById(R.id.cardview_top_right)
+        cardviewTopLeftHeader = findViewById(R.id.cardview_top_left_tv)
+        cardviewTopRightHeader = findViewById(R.id.top_right_cardview_tv)
+        cardviewSetButton = findViewById(R.id.set_button)
+        cardviewEditButton = findViewById(R.id.edit_button)
+
+//        imageButtonTopLeft = findViewById(R.id.topLeftImageButton)
+//        imageButtonTopRight = findViewById(R.id.topRightImageButton)
         //        settings = findViewById(R.id.settingsButton);
 
 //        Drawable drawable = menu.getItem(0).getIcon();
