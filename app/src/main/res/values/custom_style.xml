@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="cornerCut">
+        <item name="cornerSizeBottomRight">20dp</item>
+        <item name="cornerFamilyBottomRight">cut</item>
+    </style>
+
+</resources>

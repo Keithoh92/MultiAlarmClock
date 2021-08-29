@@ -1,25 +1,22 @@
 package com.example.multialarmclock
 
-import androidx.appcompat.app.AppCompatActivity
-import android.widget.ImageButton
-import androidx.appcompat.widget.AppCompatButton
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import android.graphics.drawable.AnimatedVectorDrawable
-import androidx.annotation.RequiresApi
+import android.graphics.drawable.ShapeDrawable
 import android.os.Build
 import android.os.Bundle
-import com.example.multialarmclock.R
-import android.graphics.drawable.Drawable
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import android.view.animation.AlphaAnimation
-
-
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.example.multialarmclock.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     var divider2: View? = null
     var alarmRangeTv: TextView? = null
     var setEveryTv: TextView? = null
+//    var radius resources
 
     private var menu: Menu? = null
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -55,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         toolbar = findViewById(R.id.mytoolbar)
         setSupportActionBar(toolbar)
+
 
         cardviewTopLeft = findViewById(R.id.cardview_top_left)
         cardviewTopRight = findViewById(R.id.cardview_top_right)

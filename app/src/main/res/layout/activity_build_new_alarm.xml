@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/cardview_dark_background"
-        >
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/mytoolbar_build_alarm"
@@ -26,7 +26,55 @@
         </androidx.appcompat.widget.Toolbar>
 
 
+        <RelativeLayout
+            android:id="@+id/text_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/shape_corner"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/edittext_background"
+                app:shapeAppearanceOverlay="@style/cornerCut"
+                >
+        </com.google.android.material.imageview.ShapeableImageView>
+
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="350dp"
+                android:layout_height="60dp"
+                android:textColor="@color/white"
+                android:hint="Name"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:inputType="textPersonName"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:elevation="3dp"
+                android:outlineProvider="none"
+                android:layout_alignBottom="@id/shape_corner"
+                >
+            </EditText>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/shape_corner2"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#1a51ed"
+                app:shapeAppearanceOverlay="@style/cornerCut"
+                android:layout_below="@id/edit_name"
+                android:layout_marginTop="2dp"
+                >
+            </com.google.android.material.imageview.ShapeableImageView>
+
+
+
+
+
+        </RelativeLayout>
 
     </LinearLayout>
 

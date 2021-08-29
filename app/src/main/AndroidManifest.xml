@@ -13,7 +13,7 @@
             android:name=".BuildNewAlarm"
             android:exported="true"
             android:label="@string/title_activity_build_new_alarm"
-            android:theme="@style/NoActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
