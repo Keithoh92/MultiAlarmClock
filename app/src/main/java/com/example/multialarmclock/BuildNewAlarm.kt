@@ -3,7 +3,10 @@ package com.example.multialarmclock
 import android.graphics.drawable.shapes.Shape
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.appcompat.widget.Toolbar
 
 import com.google.android.material.imageview.ShapeableImageView
@@ -17,6 +20,11 @@ class BuildNewAlarm : AppCompatActivity() {
     var shape_layout2: ShapeableImageView? = null
 //    var relative_layout: View? = null
 
+    var days_dialog_button: Button? = null
+    var radio_group: RadioGroup? = null
+    var onRadioButton: RadioButton? = null
+    var offRadioButton: RadioButton? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +37,11 @@ class BuildNewAlarm : AppCompatActivity() {
         edit_name = findViewById(R.id.edit_name)
 //        edit_name2 = findViewById(R.id.edit_name2)
         shape_layout = findViewById(R.id.shape_corner)
-        shape_layout2 = findViewById(R.id.shape_corner2)
-
+//        shape_layout2 = findViewById(R.id.shape_corner2)
+        days_dialog_button = findViewById(R.id.days_dialog_button)
+        radio_group = findViewById(R.id.toggle_id)
+        onRadioButton = findViewById(R.id.toggle_on)
+        offRadioButton = findViewById(R.id.toggle_off)
 
     }
 }

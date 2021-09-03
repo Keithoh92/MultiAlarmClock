@@ -89,21 +89,58 @@
 
             </Button>
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/weekly_switch"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:text="Every Week"
-                    android:paddingLeft="15dp"
-                    app:switchMinWidth="20dp"
-                    android:paddingRight="10dp"
-                    android:textColor="#1a51ed"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:layout_height="match_parent"
-                    android:layout_below="@+id/edit_name">
+<!--                <androidx.appcompat.widget.SwitchCompat-->
+<!--                    android:id="@+id/weekly_switch"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Every Week"-->
+<!--                    android:paddingLeft="15dp"-->
+<!--                    app:switchMinWidth="20dp"-->
+<!--                    android:paddingRight="10dp"-->
+<!--                    android:textColor="#1a51ed"-->
+<!--                    android:textSize="20dp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_below="@+id/edit_name">-->
 
-                </androidx.appcompat.widget.SwitchCompat>
+<!--                </androidx.appcompat.widget.SwitchCompat>-->
+            <RadioGroup
+                android:id="@+id/toggle_id"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:background="@drawable/toggle_switch_colour"
+                >
+
+                <RadioButton
+                    android:id="@+id/toggle_on"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="On"
+                    android:textColor="@color/white"
+                    android:background="@drawable/toggle_switch_background"
+                    />
+
+                <RadioButton
+                    android:id="@+id/toggle_off"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="Off"
+                    android:textColor="@color/white"
+                    android:background="@drawable/toggle_switch_background"
+                    />
+
+            </RadioGroup>
+
+
+
             </LinearLayout>
 
 
