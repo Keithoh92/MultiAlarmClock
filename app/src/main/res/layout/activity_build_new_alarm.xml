@@ -37,8 +37,8 @@
                 android:id="@+id/shape_corner"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_margin="3dp"
                 android:background="@drawable/edittext_background"
-                app:shapeAppearanceOverlay="@style/cornerCut"
                 >
         </com.google.android.material.imageview.ShapeableImageView>
 
@@ -88,63 +88,171 @@
                 android:drawableEnd="@android:drawable/arrow_down_float">
 
             </Button>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-<!--                <androidx.appcompat.widget.SwitchCompat-->
-<!--                    android:id="@+id/weekly_switch"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="Every Week"-->
-<!--                    android:paddingLeft="15dp"-->
-<!--                    app:switchMinWidth="20dp"-->
-<!--                    android:paddingRight="10dp"-->
-<!--                    android:textColor="#1a51ed"-->
-<!--                    android:textSize="20dp"-->
-<!--                    android:textStyle="bold"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_below="@+id/edit_name">-->
+                    <TextView
+                        android:id="@+id/radio_group_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:text="Set Every Week"
+                        android:gravity="center"
+                        android:textColor="#e8e8e8">
 
-<!--                </androidx.appcompat.widget.SwitchCompat>-->
+                    </TextView>
+
             <RadioGroup
                 android:id="@+id/toggle_id"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/toggle_switch_colour"
                 >
 
-                <RadioButton
-                    android:id="@+id/toggle_on"
+                    <RadioButton
+                        android:id="@+id/toggle_on"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginLeft="1dp"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="On"
+                        android:textColor="@color/white"
+                        android:background="@drawable/toggle_switch_background"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/toggle_off"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginRight="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="Off"
+                        android:textColor="@color/white"
+                        android:background="@drawable/toggle_switch_background"
+                        />
+
+                    </RadioGroup>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_centerHorizontal="true"
+                android:background="@color/blue"
+                android:layout_below="@id/layout_for_buttons"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="15dp"
+                />
+
+            <LinearLayout
+                android:id="@+id/time_button_layout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@id/divider1"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                >
+
+            <Button
+                android:id="@+id/open_time_picker_start"
+                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Select Start Time"
+                android:textColor="@color/white"
+                android:layout_marginRight="2dp"
+                android:background="@drawable/button_background2">
+            </Button>
+
+            <Button
+                android:id="@+id/open_time_picker_end"
+                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Select End Time"
+                android:textColor="@color/white"
+                android:layout_marginLeft="2dp"
+                android:background="@drawable/button_background2">
+            </Button>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/time_tvs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/time_button_layout"
+            >
+            <TextView
+                android:id="@+id/start_time_tv"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="07:00"
+                android:gravity="center"
+                android:textSize="30dp">
+
+            </TextView>
+
+                <TextView
+                    android:id="@+id/end_time_tv"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:text="On"
-                    android:textColor="@color/white"
-                    android:background="@drawable/toggle_switch_background"
-                    />
-
-                <RadioButton
-                    android:id="@+id/toggle_off"
-                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:button="@null"
+                    android:text="08:00"
                     android:gravity="center"
-                    android:text="Off"
-                    android:textColor="@color/white"
-                    android:background="@drawable/toggle_switch_background"
-                    />
+                    android:textSize="30dp">
 
-            </RadioGroup>
-
-
+                </TextView>
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_centerHorizontal="true"
+                android:background="@color/blue"
+                android:layout_below="@id/time_tvs"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                />
 
+            <TextView
+                android:id="@+id/time_range_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/time_tvs"
+                android:text="Set this alram to go off every:"
+                android:textSize="18dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center">
 
+            </TextView>
+
+            <com.ramotion.fluidslider.FluidSlider
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/time_range_tv">
+
+            </com.ramotion.fluidslider.FluidSlider>
 
         </RelativeLayout>
 

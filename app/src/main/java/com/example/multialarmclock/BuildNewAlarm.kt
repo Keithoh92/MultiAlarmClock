@@ -3,10 +3,7 @@ package com.example.multialarmclock
 import android.graphics.drawable.shapes.Shape
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.RadioGroup
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 
 import com.google.android.material.imageview.ShapeableImageView
@@ -24,6 +21,9 @@ class BuildNewAlarm : AppCompatActivity() {
     var radio_group: RadioGroup? = null
     var onRadioButton: RadioButton? = null
     var offRadioButton: RadioButton? = null
+    var radio_group_tv: TextView? = null
+    var timePicker: TimePicker? = null
+    var timePickerTV: TextView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +42,10 @@ class BuildNewAlarm : AppCompatActivity() {
         radio_group = findViewById(R.id.toggle_id)
         onRadioButton = findViewById(R.id.toggle_on)
         offRadioButton = findViewById(R.id.toggle_off)
+        radio_group_tv = findViewById(R.id.radio_group_tv)
+        timePicker = findViewById(R.id.time_picker)
+        timePickerTV = findViewById(R.id.time_picker_tv)
+
 
     }
 }
