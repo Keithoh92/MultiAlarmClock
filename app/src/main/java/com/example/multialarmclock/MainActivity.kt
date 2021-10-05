@@ -1,9 +1,11 @@
 package com.example.multialarmclock
 
+import android.content.Intent
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -20,65 +22,62 @@ import com.example.multialarmclock.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
+
+
+    private lateinit var binding: ActivityMainBinding
     var settings: ImageButton? = null
     var avd: AnimatedVectorDrawableCompat? = null
     var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
-//    var imageButtonTopLeft: AppCompatButton? = null
-//    var imageButtonTopRight: AppCompatButton? = null
-    var cardviewTopLeft: CardView? = null
-    var cardviewTopRight: CardView? = null
-    var cardviewBottomLeft: CardView? = null
-    var cardviewBottomRight: CardView? = null
 
-    var cardviewTopLeftHeader: TextView? = null
-    var cardviewTopRightHeader: TextView? = null
-    var cardviewBottomLeftHeader: TextView? = null
-    var cardviewBottomRightHeader: TextView? = null
-
-
-    var cardviewSetButton: AppCompatButton? = null
-    var cardviewEditButton: AppCompatButton? = null
-    var daysChosenTv: TextView? = null
-    var divider: View? = null
-    var divider2: View? = null
-    var alarmRangeTv: TextView? = null
-    var setEveryTv: TextView? = null
 //    var radius resources
 
     private var menu: Menu? = null
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_main)
-        toolbar = findViewById(R.id.mytoolbar)
+
+        binding.mytoolbar
         setSupportActionBar(toolbar)
 
+        intitialiseFields();
 
-        cardviewTopLeft = findViewById(R.id.cardview_top_left)
-        cardviewTopRight = findViewById(R.id.cardview_top_right)
-        cardviewBottomLeft = findViewById(R.id.cardview_bottom_left)
-        cardviewBottomRight = findViewById(R.id.cardview_bottom_right)
-
-
-
-        cardviewTopLeftHeader = findViewById(R.id.cardview_top_left_tv)
-        cardviewTopRightHeader = findViewById(R.id.top_right_cardview_tv)
-        cardviewBottomLeftHeader = findViewById(R.id.cardview_bottom_left_tv)
-        cardviewBottomRightHeader = findViewById(R.id.cardview_bottom_right_tv)
-
-        cardviewSetButton = findViewById(R.id.set_button)
-        cardviewEditButton = findViewById(R.id.edit_button)
-        daysChosenTv = findViewById(R.id.days_chosen)
-        divider = findViewById(R.id.divider)
-        divider2 = findViewById(R.id.divider2)
-        alarmRangeTv = findViewById(R.id.range)
-        setEveryTv = findViewById(R.id.go_off_times)
+        binding.cardviewBottomRight.setOnClickListener(object: View.OnClickListener {
+            override fun onClick(v: View?) {
+                openAlarmBuilder()
+            }
+        })
 
 
-//        val buttonClick = AlphaAnimation(1f, 0.8f)
 
-//        cardviewEditButton.setOnTouchListener
+    }
+
+    private fun openAlarmBuilder() {
+        val startAlarmBuilderActivity = Intent(this, BuildNewAlarm::class.java)
+        startActivity(startAlarmBuilderActivity)
+    }
+
+    private fun intitialiseFields() {
+        binding.cardviewTopLeft
+        binding.cardviewTopRight
+        binding.cardviewBottomLeft
+        binding.cardviewBottomRight
+
+
+        binding.cardviewTopLeftTv
+        binding.topRightCardviewTv
+        binding.cardviewBottomLeftTv
+        binding.cardviewBottomRightTv
+
+        binding.setButton
+        binding.editButton
+        binding.daysChosen
+        binding.divider
+        binding.divider2
+        binding.range
+        binding.goOffTimes
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

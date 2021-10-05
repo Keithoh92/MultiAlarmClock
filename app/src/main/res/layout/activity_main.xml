@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@color/cardview_dark_background">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="test"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity"
+        android:background="@color/cardview_dark_background">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/mytoolbar"
@@ -58,6 +66,7 @@
                     android:textSize="20dp">
 
                 </TextView>
+
                 <View
                     android:id="@+id/divider"
                     android:layout_width="160dp"
@@ -66,8 +75,7 @@
                     android:background="@color/cardview_dark_background"
                     android:layout_below="@id/days_chosen"
                     android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"
-                    />
+                    android:layout_marginTop="5dp" />
 
                 <TextView
                     android:id="@+id/range"
@@ -89,7 +97,7 @@
                     android:background="@color/cardview_dark_background"
                     android:layout_below="@id/range"
                     android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"/>
+                    android:layout_marginTop="5dp" />
 
                 <TextView
                     android:id="@+id/go_off_times"
@@ -102,6 +110,7 @@
                     android:layout_marginLeft="10dp">
 
                 </TextView>
+
                 <Button
                     android:id="@+id/set_button"
                     android:layout_width="90dp"
@@ -134,100 +143,103 @@
 
         </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_top_right"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="15dp"
-        app:cardBackgroundColor="#2B2A2A"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="12dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/mytoolbar">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardview_top_right"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            app:cardBackgroundColor="#2B2A2A"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="12dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/mytoolbar">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/cardview_shape">
-
-            <TextView
-                android:id="@+id/top_right_cardview_tv"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="25dp"
-                android:gravity="center_horizontal"
-                android:text="Quick\nAlarm\nBuilder"
-                android:textColor="@color/white"
-                android:textSize="33dp">
+                android:background="@drawable/cardview_shape">
 
-            </TextView>
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/top_right_cardview_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="25dp"
+                    android:gravity="center_horizontal"
+                    android:text="Quick\nAlarm\nBuilder"
+                    android:textColor="@color/white"
+                    android:textSize="33dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_bottom_left"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="15dp"
-        app:cardBackgroundColor="#2B2A2A"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="12dp"
-        android:layout_below="@id/cardview_top_left">
+                </TextView>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/cardview_shape">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardview_bottom_left"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="15dp"
+            app:cardBackgroundColor="#2B2A2A"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="12dp"
+            android:layout_below="@id/cardview_top_left">
 
-            <TextView
-                android:id="@+id/cardview_bottom_left_tv"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Saved\nAlarms"
-                android:textSize="33dp"
-                android:textColor="@color/white"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="45dp">
+                android:background="@drawable/cardview_shape">
 
-            </TextView>
+                <TextView
+                    android:id="@+id/cardview_bottom_left_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Saved\nAlarms"
+                    android:textSize="33dp"
+                    android:textColor="@color/white"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="45dp">
+
+                </TextView>
 
 
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_bottom_right"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="15dp"
-        app:cardBackgroundColor="#2B2A2A"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="12dp"
-        android:layout_below="@id/cardview_top_right"
-        android:layout_alignParentEnd="true">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardview_bottom_right"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="15dp"
+            app:cardBackgroundColor="#2B2A2A"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="12dp"
+            android:clickable="true"
+            android:layout_below="@id/cardview_top_right"
+            android:layout_alignParentEnd="true"
+            android:focusable="true">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/cardview_shape">
-
-            <TextView
-                android:id="@+id/cardview_bottom_right_tv"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Build\nNew\nAlarm"
-                android:textSize="33dp"
-                android:textColor="@color/white"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="35dp">
+                android:background="@drawable/cardview_shape">
 
-            </TextView>
+                <TextView
+                    android:id="@+id/cardview_bottom_right_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="35dp"
+                    android:gravity="center_horizontal"
+                    android:text="Build\nNew\nAlarm"
+                    android:textColor="@color/white"
+                    android:textSize="33dp">
+
+                </TextView>
 
 
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>
