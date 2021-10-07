@@ -5,24 +5,11 @@ import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableField
+import androidx.lifecycle.ViewModel
 
 
-class BuildAlarmViewModel:BaseObservable(){
+class BuildAlarmViewModel: ViewModel() {
 
-    @set:Bindable
-    var isChecked: Boolean? = null
+    val alarmName:String? = TODO()
+    val daysSelected:ArrayList<String> = TODO()
 }
-
-//private operator fun Boolean.invoke(value: Any): Any {
-//    this.invoke(true)
-//}
-
-
-//@BindingAdapter("android:layout_height")
-//fun setLayoutHeight(view: RelativeLayout, height: Float?) {
-//    view.layoutParams = view.layoutParams.apply {
-//        if (height != null) {
-//            this.height = height.toInt()
-//        }
-//    }
-//}

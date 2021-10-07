@@ -4,4 +4,5 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="height_cv_big">150dp</dimen>
     <dimen name="height_cv_small">50dp</dimen>
+    <dimen name="num_picker">5dp</dimen>
 </resources>

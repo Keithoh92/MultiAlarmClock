@@ -117,7 +117,7 @@
                     android:layout_height="50dp"
                     android:layout_marginLeft="1dp"
                     android:text="Set"
-                    android:foreground="?android:attr/selectableItemBackground"
+                    android:foreground="?attr/selectableItemBackground"
                     android:textColor="#1a51ed"
                     android:layout_alignParentBottom="true"
                     android:background="@drawable/main_button_corners">
@@ -164,11 +164,14 @@
                     android:id="@+id/top_right_cardview_tv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="25dp"
-                    android:gravity="center_horizontal"
-                    android:text="Quick\nAlarm\nBuilder"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="New\nOne Time\nAlarm"
                     android:textColor="@color/white"
-                    android:textSize="33dp">
+                    android:shadowDx="5"
+                    android:shadowDy="5"
+                    android:shadowColor="@color/dark_cv"
+                    android:textSize="28dp">
 
                 </TextView>
             </RelativeLayout>
@@ -229,11 +232,10 @@
                     android:id="@+id/cardview_bottom_right_tv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="35dp"
-                    android:gravity="center_horizontal"
-                    android:text="Build\nNew\nAlarm"
+                    android:gravity="center"
+                    android:text="Set New\nRegular\nInterval\nAlarm"
                     android:textColor="@color/white"
-                    android:textSize="33dp">
+                    android:textSize="24dp">
 
                 </TextView>
 

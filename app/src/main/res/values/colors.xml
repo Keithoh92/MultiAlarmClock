@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#032ca6</color>
     <color name="dark_cv">#141414</color>
+    <color name="edit_text_blue">#032ca6</color>
 </resources>
