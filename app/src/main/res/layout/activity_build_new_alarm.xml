@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="dataModel"
-            type="com.example.multialarmclock.classes.BuildAlarmViewModel" />
+            type="com.example.multialarmclock.classes.AlarmViewModel" />
     </data>
 
     <ScrollView

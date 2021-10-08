@@ -5,7 +5,6 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.database.Cursor
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -14,14 +13,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import com.example.multialarmclock.classes.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
-import java.lang.reflect.Array.get
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -36,6 +32,7 @@ class BuildNewAlarm : AppCompatActivity() {
 
     internal lateinit var startTimeTv:TextView
     internal lateinit var endTimeTv:TextView
+    internal lateinit var alarmName:EditText
 
     internal lateinit var daysSelected:ArrayList<String>
     internal lateinit var cbDay1:CheckBox
@@ -61,6 +58,7 @@ class BuildNewAlarm : AppCompatActivity() {
         //VIEWS INITIALISATION
         setSupportActionBar(binding.mytoolbarBuildAlarm)
         binding.shapeCorner
+        alarmName = findViewById(R.id.edit_name)
         binding.radioGroup
         val myRadioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         val toggleOn = findViewById<RadioButton>(R.id.toggle_on)
@@ -171,27 +169,38 @@ class BuildNewAlarm : AppCompatActivity() {
 
         val saveButton = findViewById(R.id.save_button) as Button
         saveButton.setOnClickListener{
-            getCheckedDays()
-            cbDay1.setOnClickListener{
-            val model = it.tag as? BuildNewAlarmModel ?: return@setOnClickListener
+            var alarmDays = arrayListOf<String>()
 
-                var weekly = toggleOn.isChecked
-//                var chosenRingtone =
+            //Alarm name
 
+            //Days Selected
+            alarmDays = getCheckedDays()
 
+            //Is set to weekly?
+            var weekly = toggleOn.isChecked
 
+            //startTime
 
-//            val newModel = saveAlarmModel()
-            }
+            //EndTime
+
+            //Ringtone
+
+            //Interval
         }
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
-//    private fun saveAlarmModel(): Any {
-//
-//    }
+//    private fun saveAlarmModel(
+//        alarmName: String,
+//        daysSelected:ArrayList<String>,
+//        weekly:Boolean,
+//        startTime:String,
+//        endTime:String,
+//        sound:Uri,
+//        interval:Int
+//    ):BuildNewAlarmModel
 
-    private fun getCheckedDays() {
+    private fun getCheckedDays(): ArrayList<String> {
         daysSelected = arrayListOf()
         if(cbDay1.isChecked){
             Log.d("DaysCheccked: ", cbDay1.text.toString())
@@ -221,5 +230,6 @@ class BuildNewAlarm : AppCompatActivity() {
             Log.d("DaysCheccked: ", cbDay7.text.toString())
             daysSelected.add("Sun")
         }
+        return daysSelected
     }
 }
