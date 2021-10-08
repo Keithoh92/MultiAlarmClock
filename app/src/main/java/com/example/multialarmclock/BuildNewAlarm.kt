@@ -1,6 +1,7 @@
 package com.example.multialarmclock
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -13,7 +14,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import com.example.multialarmclock.classes.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
@@ -42,6 +46,8 @@ class BuildNewAlarm : AppCompatActivity() {
     internal lateinit var cbDay6:CheckBox
     internal lateinit var cbDay7:CheckBox
 
+    internal lateinit var rt_tv:TextView
+
     internal var min: Double = 00.00
     internal var max: Double = 00.00
 
@@ -54,12 +60,20 @@ class BuildNewAlarm : AppCompatActivity() {
 
         //VIEWS INITIALISATION
         setSupportActionBar(binding.mytoolbarBuildAlarm)
-//        slider = findViewById(R.id.fluid_slider)
         binding.shapeCorner
         binding.radioGroup
-        binding.toggleOn
-        binding.toggleOff
-        binding.radioGroupTv
+        val myRadioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+        val toggleOn = findViewById<RadioButton>(R.id.toggle_on)
+        val toggleOff = findViewById<RadioButton>(R.id.toggle_off)
+
+        toggleOff.isChecked = true
+        if(toggleOff.isChecked){
+            toggleOn.isChecked = false
+        }
+        if(toggleOn.isChecked){
+            toggleOff.isChecked = false
+        }
+
 
         ///////////////////////// ALARM DAY CHOICES /////////////////////////////////////
         cbDay1 = findViewById(R.id.cb_day1)
@@ -70,8 +84,6 @@ class BuildNewAlarm : AppCompatActivity() {
         cbDay6 = findViewById(R.id.cb_day6)
         cbDay7 = findViewById(R.id.cb_day7)
 
-        daysSelected = arrayListOf()
-
         //////////////////////////////////      ALARM TIME LOGIC  ///////////////////////////////////////
         val startButton = findViewById<Button>(R.id.open_time_picker_start)
         val endButton = findViewById<Button>(R.id.open_time_picker_end)
@@ -79,20 +91,17 @@ class BuildNewAlarm : AppCompatActivity() {
         startTimeTv = findViewById(R.id.start_time_tv)
         endTimeTv = findViewById(R.id.end_time_tv)
 
+        val minute = 0
         startButton.setOnClickListener{
             val timeSetlistener = TimePickerDialog.OnTimeSetListener{
                     timePicker, hour, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
                 startTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
+                endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time.time.plus(1))
 
-//                val timeText:String
-//                get(){
-//                    val h
-//                }
-            
             }
-            TimePickerDialog(this, timeSetlistener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+            TimePickerDialog(this, timeSetlistener, 7, 0, true).show()
         }
 
         endButton.setOnClickListener{
@@ -102,7 +111,7 @@ class BuildNewAlarm : AppCompatActivity() {
                 cal.set(Calendar.MINUTE, minute)
                 endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
             }
-            TimePickerDialog(this, timeSetlistener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+            TimePickerDialog(this, timeSetlistener, Calendar.HOUR_OF_DAY, Calendar.MINUTE, true).show()
         }
 
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
@@ -116,30 +125,14 @@ class BuildNewAlarm : AppCompatActivity() {
         }
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        val saveButton = findViewById(R.id.save_button) as Button
-        saveButton.setOnClickListener{
-            getCheckedDays()
-        }
-        var alarmSo = findViewById(R.id.alarm_sound) as TextView
-
-        val ringtone = RingtoneManager(this)
         val currentRingtone: Uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM)
-//        alarmSo.text = RingtoneManager.TYPE_RINGTONE.toString()
-//        currentRingtone.
-//        ringtone.cursor.
-//        currentRingtone.
-        val cursor = ringtone.cursor
+
         val rt: Ringtone = RingtoneManager.getRingtone(this, currentRingtone)
         val rt1 = rt.getTitle(this)
         Log.d("RT", rt1.toString())
 
-        val rt_tv = findViewById<TextView>(R.id.ringtone_tv)
+        rt_tv = findViewById(R.id.ringtone_tv)
         rt_tv.text = "Current:\n"+rt1.toString()
-//        while (cursor.moveToNext()){
-//            var title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX)
-//            Log.d("RT", title)
-//        }
-
 
        val playButton = findViewById<ImageButton>(R.id.play_button)
        val stopButton = findViewById<ImageButton>(R.id.stop_button)
@@ -155,45 +148,78 @@ class BuildNewAlarm : AppCompatActivity() {
             stopButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
         }
+
+        var getResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                if(it.resultCode == Activity.RESULT_OK){
+                    val uri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    val rt: Ringtone = RingtoneManager.getRingtone(this, uri)
+                    val rt1 = rt.getTitle(this)
+                    rt_tv.text = "Current:\n"+rt1.toString()
+                }
+            }
+
         chooseRingtone.setOnClickListener{
             val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE)
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alarm Sound")
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentRingtone)
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            getResult.launch(intent)
         }
 
+        val saveButton = findViewById(R.id.save_button) as Button
+        saveButton.setOnClickListener{
+            getCheckedDays()
+            cbDay1.setOnClickListener{
+            val model = it.tag as? BuildNewAlarmModel ?: return@setOnClickListener
+
+                var weekly = toggleOn.isChecked
+//                var chosenRingtone =
+
+
+
+
+//            val newModel = saveAlarmModel()
+            }
+        }
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
-//    private fun getTime(hour:Int, min:Int) {
-//        get(){
-//            val h = "%02d".format(if(hour < 12) hour else hour - 12)
-//            val m = "%02d".format(min)
+//    private fun saveAlarmModel(): Any {
 //
-//            return "$h:$m"
-//        }
 //    }
 
-
     private fun getCheckedDays() {
+        daysSelected = arrayListOf()
         if(cbDay1.isChecked){
             Log.d("DaysCheccked: ", cbDay1.text.toString())
+            daysSelected.add("Mon")
         }
         if(cbDay2.isChecked){
             Log.d("DaysCheccked: ", cbDay2.text.toString())
+            daysSelected.add("Tue")
         }
         if(cbDay3.isChecked){
             Log.d("DaysCheccked: ", cbDay3.text.toString())
+            daysSelected.add("Wed")
         }
         if(cbDay4.isChecked){
             Log.d("DaysCheccked: ", cbDay4.text.toString())
+            daysSelected.add("Thu")
         }
         if(cbDay5.isChecked){
             Log.d("DaysCheccked: ", cbDay5.text.toString())
+            daysSelected.add("Fri")
         }
         if(cbDay6.isChecked){
             Log.d("DaysCheccked: ", cbDay6.text.toString())
+            daysSelected.add("Sat")
         }
         if(cbDay7.isChecked){
             Log.d("DaysCheccked: ", cbDay7.text.toString())
+            daysSelected.add("Sun")
         }
     }
 }
