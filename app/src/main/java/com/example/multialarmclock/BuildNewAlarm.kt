@@ -10,17 +10,24 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
+import com.example.multialarmclock.classes.AlarmViewModel
+import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
+import kotlinx.coroutines.InternalCoroutinesApi
+import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.time.hours
 
 class BuildNewAlarm : AppCompatActivity() {
 
@@ -28,11 +35,17 @@ class BuildNewAlarm : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     internal lateinit var slider:FluidSlider
 
+    @InternalCoroutinesApi
+    private lateinit var mAlarmViewModel:AlarmViewModel
+
     val cal = Calendar.getInstance()
 
     internal lateinit var startTimeTv:TextView
     internal lateinit var endTimeTv:TextView
     internal lateinit var alarmName:EditText
+
+    internal lateinit var toggleOn:RadioButton
+    internal lateinit var toggleOff:RadioButton
 
     internal lateinit var daysSelected:ArrayList<String>
     internal lateinit var cbDay1:CheckBox
@@ -44,10 +57,16 @@ class BuildNewAlarm : AppCompatActivity() {
     internal lateinit var cbDay7:CheckBox
 
     internal lateinit var rt_tv:TextView
+    internal lateinit var ringtoneDefault:Ringtone
+    internal lateinit var chosenRingtone:Ringtone
+    var currentRingtone:Uri = TODO()
+    var chosenRTUri:Uri?=null
+    internal lateinit var intervalPicker:NumberPicker
 
     internal var min: Double = 00.00
     internal var max: Double = 00.00
 
+    @InternalCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("LongLogTag", "RestrictedApi", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,14 +74,16 @@ class BuildNewAlarm : AppCompatActivity() {
         binding = ActivityBuildNewAlarmBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_build_new_alarm)
 
+        mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+
         //VIEWS INITIALISATION
         setSupportActionBar(binding.mytoolbarBuildAlarm)
         binding.shapeCorner
         alarmName = findViewById(R.id.edit_name)
         binding.radioGroup
         val myRadioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-        val toggleOn = findViewById<RadioButton>(R.id.toggle_on)
-        val toggleOff = findViewById<RadioButton>(R.id.toggle_off)
+        toggleOn = findViewById<RadioButton>(R.id.toggle_on)
+        toggleOff = findViewById<RadioButton>(R.id.toggle_off)
 
         toggleOff.isChecked = true
         if(toggleOff.isChecked){
@@ -115,7 +136,7 @@ class BuildNewAlarm : AppCompatActivity() {
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
 
         /////////////////////////////// INTERVAL TIME PICKER //////////////////////////////////////////////
-        val intervalPicker = findViewById<NumberPicker>(R.id.interval_picker)
+        intervalPicker = findViewById(R.id.interval_picker)
         intervalPicker.minValue = 0
         intervalPicker.maxValue = 60
         intervalPicker.setFormatter {
@@ -123,10 +144,10 @@ class BuildNewAlarm : AppCompatActivity() {
         }
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        val currentRingtone: Uri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM)
+        currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM)
 
-        val rt: Ringtone = RingtoneManager.getRingtone(this, currentRingtone)
-        val rt1 = rt.getTitle(this)
+        val ringtoneDefault = RingtoneManager.getRingtone(this, currentRingtone)
+        val rt1 = ringtoneDefault.getTitle(this)
         Log.d("RT", rt1.toString())
 
         rt_tv = findViewById(R.id.ringtone_tv)
@@ -137,12 +158,20 @@ class BuildNewAlarm : AppCompatActivity() {
        val chooseRingtone = findViewById<ImageButton>(R.id.choose_ringtone)
 
         playButton.setOnClickListener{
-            rt.play()
+            if(chosenRingtone == null){
+                ringtoneDefault.play()
+            }else{
+                chosenRingtone.play()
+            }
             playButton.visibility = View.INVISIBLE
             stopButton.visibility = View.VISIBLE
         }
         stopButton.setOnClickListener{
-            rt.stop()
+            if(chosenRingtone == null){
+                ringtoneDefault.stop()
+            }else{
+                chosenRingtone.stop()
+            }
             stopButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
         }
@@ -150,9 +179,9 @@ class BuildNewAlarm : AppCompatActivity() {
         var getResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 if(it.resultCode == Activity.RESULT_OK){
-                    val uri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                    val rt: Ringtone = RingtoneManager.getRingtone(this, uri)
-                    val rt1 = rt.getTitle(this)
+                    chosenRTUri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    val chosenRingtone = RingtoneManager.getRingtone(this, chosenRTUri)
+                    val rt1 = chosenRingtone.getTitle(this)
                     rt_tv.text = "Current:\n"+rt1.toString()
                 }
             }
@@ -169,36 +198,32 @@ class BuildNewAlarm : AppCompatActivity() {
 
         val saveButton = findViewById(R.id.save_button) as Button
         saveButton.setOnClickListener{
-            var alarmDays = arrayListOf<String>()
-
-            //Alarm name
-
-            //Days Selected
-            alarmDays = getCheckedDays()
-
-            //Is set to weekly?
-            var weekly = toggleOn.isChecked
-
-            //startTime
-
-            //EndTime
-
-            //Ringtone
-
-            //Interval
+            insertNewAlarmToDB()
         }
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
-//    private fun saveAlarmModel(
-//        alarmName: String,
-//        daysSelected:ArrayList<String>,
-//        weekly:Boolean,
-//        startTime:String,
-//        endTime:String,
-//        sound:Uri,
-//        interval:Int
-//    ):BuildNewAlarmModel
+    private fun insertNewAlarmToDB() {
+        var alarmDays = arrayListOf<String>()
+
+        val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
+        //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
+        alarmDays = getCheckedDays()                                                            //Days Selected
+        var weekly = toggleOn.isChecked                                                         //Is set to weekly?
+        val startTime = startTimeTv.text                                                        //startTime
+        val endTime = endTimeTv.text                                                            //EndTime
+        val ringtoneChosen:Uri = chosenRTUri ?: currentRingtone     //Ringtone
+        val interval = intervalPicker.value                                                     //Interval
+        val time = cal.time
+//        if(inputCheck(usersAlarmName, alarmDays, startTime, endTime, ))
+        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval,
+            time as Time
+        )
+    }
+    private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
+        return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
+    }
+
 
     private fun getCheckedDays(): ArrayList<String> {
         daysSelected = arrayListOf()

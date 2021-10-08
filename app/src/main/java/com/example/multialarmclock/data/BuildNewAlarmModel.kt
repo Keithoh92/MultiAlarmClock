@@ -14,10 +14,10 @@ data class BuildNewAlarmModel(
     val alarmName:String,
     val daysSelected:ArrayList<String>,
     val weekly:Boolean,
-    val startTime:String,
-    val endTime:String,
+    val startTime:CharSequence,
+    val endTime:CharSequence,
     val sound: Uri,
     val interval:Int,
-    val time:Time
+    val time: Time
 
 )
