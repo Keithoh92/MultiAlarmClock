@@ -17,22 +17,34 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
+import com.example.multialarmclock.classes.AlarmViewModel
+import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
+import kotlinx.coroutines.InternalCoroutinesApi
+import android.widget.ListAdapter as ListAdapter
 
 
 class MainActivity : AppCompatActivity() {
 
 
     private lateinit var binding: ActivityMainBinding
+    @InternalCoroutinesApi
+    private lateinit var mAlarmModel: AlarmViewModel
     var settings: ImageButton? = null
     var avd: AnimatedVectorDrawableCompat? = null
     var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
 
+    internal lateinit var cvBottomRight:CardView
 //    var radius resources
 
     private var menu: Menu? = null
+    @InternalCoroutinesApi
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,14 +54,23 @@ class MainActivity : AppCompatActivity() {
         binding.mytoolbar
         setSupportActionBar(toolbar)
 
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        val adapter = com.example.multialarmclock.list.ListAdapter()
+//        val recyclerView = binding.recyclerview
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+
+        mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mAlarmModel.readAllData.observe(this, Observer { alarm->
+            adapter.setData(alarm)
+        })
         intitialiseFields();
 
-        binding.cardviewBottomRight.setOnClickListener(object: View.OnClickListener {
+        cvBottomRight.setOnClickListener(object: View.OnClickListener {
             override fun onClick(v: View?) {
                 openAlarmBuilder()
             }
         })
-
 
 
     }
@@ -60,10 +81,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun intitialiseFields() {
-        binding.cardviewTopLeft
-        binding.cardviewTopRight
-        binding.cardviewBottomLeft
-        binding.cardviewBottomRight
+        val cardviewTopLeft = findViewById<CardView>(R.id.cardview_top_left)
+        val cardviewTopRight = findViewById<CardView>(R.id.cardview_top_right)
+        val cardviewBottomLeft = findViewById<CardView>(R.id.cardview_top_right)
+        cvBottomRight = findViewById(R.id.cardview_bottom_right)
 
 
         binding.cardviewTopLeftTv

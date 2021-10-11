@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 @InternalCoroutinesApi
 class AlarmViewModel(application: Application): AndroidViewModel(application) {
 
-    private val readAllData:LiveData<List<BuildNewAlarmModel>>
+    val readAllData:LiveData<List<BuildNewAlarmModel>>
     private val repository:AlarmRepository
     init{
         val alarmDao = AlarmDatabase.getDatabase(application).alarmDao()

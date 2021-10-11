@@ -12,12 +12,12 @@ data class BuildNewAlarmModel(
     @PrimaryKey(autoGenerate = true)
     val id:Int,
     val alarmName:String,
-    val daysSelected:ArrayList<String>,
+    val daysSelected:String,
     val weekly:Boolean,
-    val startTime:CharSequence,
-    val endTime:CharSequence,
-    val sound: Uri,
+    val startTime:String,
+    val endTime:String,
+    val sound: String,
     val interval:Int,
-    val time: Time
+    val time: String
 
 )

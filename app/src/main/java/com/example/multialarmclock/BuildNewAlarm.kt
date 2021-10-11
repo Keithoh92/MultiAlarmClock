@@ -16,13 +16,20 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.example.multialarmclock.classes.AlarmViewModel
+import com.example.multialarmclock.classes.DisplayModel
+import com.example.multialarmclock.classes.TimeViewModel
+import com.example.multialarmclock.classes.TimeViewModelFactory
 import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
+import java.lang.reflect.Array.get
 import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,6 +44,7 @@ class BuildNewAlarm : AppCompatActivity() {
 
     @InternalCoroutinesApi
     private lateinit var mAlarmViewModel:AlarmViewModel
+    internal lateinit var myTimeDisplayViewmodel:TimeViewModel
 
     val cal = Calendar.getInstance()
 
@@ -56,12 +64,17 @@ class BuildNewAlarm : AppCompatActivity() {
     internal lateinit var cbDay6:CheckBox
     internal lateinit var cbDay7:CheckBox
 
+    internal lateinit var timeStart:String
+    internal lateinit var timeEnd:String
+
     internal lateinit var rt_tv:TextView
     internal lateinit var ringtoneDefault:Ringtone
     internal lateinit var chosenRingtone:Ringtone
-    var currentRingtone:Uri = TODO()
+    internal lateinit var currentRingtone:Uri
     var chosenRTUri:Uri?=null
     internal lateinit var intervalPicker:NumberPicker
+
+    var dbInsertionSuccessful:Long = 0
 
     internal var min: Double = 00.00
     internal var max: Double = 00.00
@@ -71,10 +84,13 @@ class BuildNewAlarm : AppCompatActivity() {
     @SuppressLint("LongLogTag", "RestrictedApi", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityBuildNewAlarmBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_build_new_alarm)
-
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_build_new_alarm)
+        val factory = TimeViewModelFactory()
         mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        myTimeDisplayViewmodel = ViewModelProvider(this).get(TimeViewModel::class.java)
+        binding.timeViewModel = myTimeDisplayViewmodel
+        binding.lifecycleOwner = this
+
 
         //VIEWS INITIALISATION
         setSupportActionBar(binding.mytoolbarBuildAlarm)
@@ -117,8 +133,10 @@ class BuildNewAlarm : AppCompatActivity() {
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
                 startTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
-                endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time.time.plus(1))
-
+                myTimeDisplayViewmodel.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE))
+                timeStart = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
+                timeEnd = endTimeTv.text.toString()
+                Log.d("tti", timeStart)
             }
             TimePickerDialog(this, timeSetlistener, 7, 0, true).show()
         }
@@ -129,8 +147,10 @@ class BuildNewAlarm : AppCompatActivity() {
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
                 endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
+                timeEnd = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
+                Log.d("Testing endtimesb", timeEnd)
             }
-            TimePickerDialog(this, timeSetlistener, Calendar.HOUR_OF_DAY, Calendar.MINUTE, true).show()
+            TimePickerDialog(this, timeSetlistener, 8, 0, true).show()
         }
 
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
@@ -203,29 +223,34 @@ class BuildNewAlarm : AppCompatActivity() {
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
+    @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-        var alarmDays = arrayListOf<String>()
-
+//        var alarmDays = arrayListOf<String>()
+//        var sb = StringBuilder()
         val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
         //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
-        alarmDays = getCheckedDays()                                                            //Days Selected
-        var weekly = toggleOn.isChecked                                                         //Is set to weekly?
-        val startTime = startTimeTv.text                                                        //startTime
-        val endTime = endTimeTv.text                                                            //EndTime
-        val ringtoneChosen:Uri = chosenRTUri ?: currentRingtone     //Ringtone
-        val interval = intervalPicker.value                                                     //Interval
-        val time = cal.time
-//        if(inputCheck(usersAlarmName, alarmDays, startTime, endTime, ))
-        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval,
-            time as Time
-        )
+        var alarmDays = getCheckedDays()                                                            //Days Selected
+//        var separator = ""
+//        for (i in alarmDays.indices){
+//            sb.append(separator+daysSelected[i])
+//            separator = ","//MON,TUES
+//        }
+        var weekly = toggleOn.isChecked     //Is set to weekly?
+        val startTime = timeStart   //07:00
+        val endTime = timeEnd    //08:00
+        val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
+        val interval = intervalPicker.value
+        val time = cal.time.toString()
+        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time)
+        mAlarmViewModel.addAlarm(alarm)
+        Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
+
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
     }
 
-
-    private fun getCheckedDays(): ArrayList<String> {
+    private fun getCheckedDays(): String {
         daysSelected = arrayListOf()
         if(cbDay1.isChecked){
             Log.d("DaysCheccked: ", cbDay1.text.toString())
@@ -255,6 +280,20 @@ class BuildNewAlarm : AppCompatActivity() {
             Log.d("DaysCheccked: ", cbDay7.text.toString())
             daysSelected.add("Sun")
         }
-        return daysSelected
+        var separator = ""
+        var sb = StringBuilder()
+        for (i in daysSelected.indices){
+            sb.append(separator+daysSelected[i])
+            separator = ","//MON,TUES
+        }
+        return sb.toString()
+    }
+
+    fun formatTimeForDB(hour:Int, minute:Int): String {
+
+        val h = "%02d".format(if (hour < 12) hour else hour - 12)
+        val m = "%02d".format(minute)
+
+        return "$h:$m"
     }
 }
