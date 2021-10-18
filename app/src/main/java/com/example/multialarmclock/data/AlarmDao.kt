@@ -1,6 +1,7 @@
 package com.example.multialarmclock.data
 
 import android.content.ClipData
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
@@ -16,6 +17,6 @@ interface AlarmDao {
     @Query("SELECT * FROM my_alarms ORDER BY id DESC")
     fun readAllData(): LiveData<List<BuildNewAlarmModel>>
 
-    @Query("SELECT alarmName FROM my_alarms ORDER BY id DESC limit 1")
-    fun readLastEntered(): LiveData<String>
+    @Query("SELECT * FROM my_alarms ORDER BY id DESC limit 1")
+    fun readLastEntered(): LiveData<List<BuildNewAlarmModel>>
 }

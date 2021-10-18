@@ -1,6 +1,7 @@
 package com.example.multialarmclock.classes
 
 import android.app.Application
+import android.database.Cursor
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -16,11 +17,15 @@ import kotlinx.coroutines.launch
 class AlarmViewModel(application: Application): AndroidViewModel(application) {
 
     val readAllData:LiveData<List<BuildNewAlarmModel>>
+
+//    val readLastEntered: Cursor
+
     private val repository:AlarmRepository
     init{
         val alarmDao = AlarmDatabase.getDatabase(application).alarmDao()
         repository = AlarmRepository(alarmDao)
         readAllData = repository.readAllData
+//        readLastEntered = repository.readLastEntered
     }
 
     fun addAlarm(buildAlarm:BuildNewAlarmModel){

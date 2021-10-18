@@ -250,7 +250,7 @@ class BuildNewAlarm : AppCompatActivity() {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
     }
 
-    private fun getCheckedDays(): String {
+    fun getCheckedDays(): String {
         daysSelected = arrayListOf()
         if(cbDay1.isChecked){
             Log.d("DaysCheccked: ", cbDay1.text.toString())

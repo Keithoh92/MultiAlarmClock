@@ -1,16 +1,22 @@
 package com.example.multialarmclock
 
+import android.content.ContentResolver
 import android.content.Intent
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +29,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.example.multialarmclock.classes.AlarmViewModel
+import com.example.multialarmclock.data.AlarmDao
+import com.example.multialarmclock.data.AlarmDatabase
 import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -39,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     var avd: AnimatedVectorDrawableCompat? = null
     var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
+
+    private lateinit var cursor:Cursor
 
     internal lateinit var cvBottomRight:CardView
 //    var radius resources
@@ -64,6 +74,43 @@ class MainActivity : AppCompatActivity() {
         mAlarmModel.readAllData.observe(this, Observer { alarm->
             adapter.setData(alarm)
         })
+
+        val daysChosen = findViewById<TextView>(R.id.days_chosen)
+        val range = findViewById<TextView>(R.id.range)
+        val interval = findViewById<TextView>(R.id.go_off_times)
+
+//        val fs = mAlarmModel.readLastEntered
+//        mAlarmModel.readLastEntered.observe(this, Observer { alarm->
+//            daysChosen.text = alarm.toString()
+//            range.text = alarm.get(4).toString()+alarm.get(5).toString()
+//            interval.text = alarm.get(7).toString()
+
+//            Log.d("DB testing", alarm.get(0).alarmName.toString())
+//            Log.d("DB testing", alarm.last().toString())
+//        })
+
+//        val db = this.mAlarmModel
+//
+//        cursor = mAlarmModel.readLastEntered
+//        if(cursor.moveToFirst()){
+//            do{
+//                daysChosen.text = cursor.columnNames(mAlarmModel.readLastEntered)
+//            }
+//        }
+
+//        try{
+//            cursor = db.readLastEntered.observe(this, Observer { cursor->
+//                cursor.get(0).alarmName
+//            })
+//        }
+
+//        val db:SQLiteDatabase
+//        db.get
+
+
+
+        val switchButton = findViewById<Switch>(R.id.my_switch)
+
         intitialiseFields();
 
         cvBottomRight.setOnClickListener(object: View.OnClickListener {
