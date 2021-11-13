@@ -18,14 +18,14 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
 
     val readAllData:LiveData<List<BuildNewAlarmModel>>
 
-//    val readLastEntered: Cursor
+    val readLastEntered: LiveData<List<BuildNewAlarmModel>>
 
     private val repository:AlarmRepository
     init{
         val alarmDao = AlarmDatabase.getDatabase(application).alarmDao()
         repository = AlarmRepository(alarmDao)
         readAllData = repository.readAllData
-//        readLastEntered = repository.readLastEntered
+        readLastEntered = repository.readLastEntered
     }
 
     fun addAlarm(buildAlarm:BuildNewAlarmModel){

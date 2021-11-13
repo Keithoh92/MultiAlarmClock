@@ -5,6 +5,8 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -16,6 +18,7 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +32,8 @@ import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
+import nl.joery.timerangepicker.TimeRangePicker
+import nl.joery.timerangepicker.TimeRangePicker.Thumb.START
 import java.lang.reflect.Array.get
 import java.sql.Time
 import java.text.SimpleDateFormat
@@ -49,7 +54,7 @@ class BuildNewAlarm : AppCompatActivity() {
     val cal = Calendar.getInstance()
 
     internal lateinit var startTimeTv:TextView
-    internal lateinit var endTimeTv:TextView
+//    internal lateinit var endTimeTv:TextView
     internal lateinit var alarmName:EditText
 
     internal lateinit var toggleOn:RadioButton
@@ -66,10 +71,15 @@ class BuildNewAlarm : AppCompatActivity() {
 
     internal lateinit var timeStart:String
     internal lateinit var timeEnd:String
+    internal lateinit var picker:TimeRangePicker
+//    internal lateinit var chooseTime:ImageButton
+    internal lateinit var timeRangeCV:CardView
+    internal lateinit var starttimeTV:TextView
+    internal lateinit var endTimeTV:TextView
 
     internal lateinit var rt_tv:TextView
     internal lateinit var ringtoneDefault:Ringtone
-    internal lateinit var chosenRingtone:Ringtone
+    internal var chosenRingtone:Ringtone? = null
     internal lateinit var currentRingtone:Uri
     var chosenRTUri:Uri?=null
     internal lateinit var intervalPicker:NumberPicker
@@ -119,39 +129,55 @@ class BuildNewAlarm : AppCompatActivity() {
         cbDay6 = findViewById(R.id.cb_day6)
         cbDay7 = findViewById(R.id.cb_day7)
 
-        //////////////////////////////////      ALARM TIME LOGIC  ///////////////////////////////////////
-        val startButton = findViewById<Button>(R.id.open_time_picker_start)
-        val endButton = findViewById<Button>(R.id.open_time_picker_end)
-
+        picker = findViewById(R.id.picker1)
+        timeRangeCV = findViewById(R.id.time_range_picker)
         startTimeTv = findViewById(R.id.start_time_tv)
-        endTimeTv = findViewById(R.id.end_time_tv)
+        endTimeTV = findViewById(R.id.end_time_tv)
 
-        val minute = 0
-        startButton.setOnClickListener{
-            val timeSetlistener = TimePickerDialog.OnTimeSetListener{
-                    timePicker, hour, minute ->
-                cal.set(Calendar.HOUR_OF_DAY, hour)
-                cal.set(Calendar.MINUTE, minute)
-                startTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
-                myTimeDisplayViewmodel.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE))
-                timeStart = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
-                timeEnd = endTimeTv.text.toString()
-                Log.d("tti", timeStart)
-            }
-            TimePickerDialog(this, timeSetlistener, 7, 0, true).show()
-        }
+        picker.sliderColor = Color.BLUE
+        picker.clockFace = TimeRangePicker.ClockFace.APPLE
+        picker.clockLabelColor = Color.WHITE
+        picker.thumbSize = 100
+        picker.thumbSizeActiveGrow = 1.0f
+        picker.timeStepMinutes = 5
+        picker.startTimeMinutes = 0
+        picker.startTime = TimeRangePicker.Time(12,0)
+        picker.endTime = TimeRangePicker.Time(7,0)
+        startTimeTv.text = picker.startTime.toString()
+        endTimeTV.text = picker.endTime.toString()
 
-        endButton.setOnClickListener{
-            val timeSetlistener = TimePickerDialog.OnTimeSetListener{
-                    timePicker, hour, minute ->
-                cal.set(Calendar.HOUR_OF_DAY, hour)
-                cal.set(Calendar.MINUTE, minute)
-                endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
-                timeEnd = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
-                Log.d("Testing endtimesb", timeEnd)
+        picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
+            override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
+                // Do something on start dragging
+                if(thumb == TimeRangePicker.Thumb.START){
+                    startTimeTv.textSize = 20.0f
+                }
+                if(thumb == TimeRangePicker.Thumb.END){
+                    endTimeTV.textSize = 20.0f
+                }
+                return true // Return false to disallow the user from dragging a handle.
             }
-            TimePickerDialog(this, timeSetlistener, 8, 0, true).show()
-        }
+
+            override fun onDragStop(thumb: TimeRangePicker.Thumb) {
+                startTimeTv.textSize = 15.0f
+                endTimeTV.textSize = 15.0f
+            }
+        })
+
+        picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
+            override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
+                Log.d("TimeRangePicker", "Duration: " + duration)
+            }
+
+            override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
+                endTimeTV.text = "End Time: ${endTime}"
+            }
+
+            override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
+                Log.d("TimeRangePicker", "Start time: " + startTime)
+                startTimeTv.text = "Start Time: ${startTime}"
+            }
+        })
 
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
 
@@ -181,7 +207,7 @@ class BuildNewAlarm : AppCompatActivity() {
             if(chosenRingtone == null){
                 ringtoneDefault.play()
             }else{
-                chosenRingtone.play()
+                chosenRingtone!!.play()
             }
             playButton.visibility = View.INVISIBLE
             stopButton.visibility = View.VISIBLE
@@ -190,7 +216,7 @@ class BuildNewAlarm : AppCompatActivity() {
             if(chosenRingtone == null){
                 ringtoneDefault.stop()
             }else{
-                chosenRingtone.stop()
+                chosenRingtone!!.stop()
             }
             stopButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
@@ -236,8 +262,8 @@ class BuildNewAlarm : AppCompatActivity() {
 //            separator = ","//MON,TUES
 //        }
         var weekly = toggleOn.isChecked     //Is set to weekly?
-        val startTime = timeStart   //07:00
-        val endTime = timeEnd    //08:00
+        val startTime = picker.startTime.toString()   //07:00
+        val endTime = picker.endTime.toString()    //08:00
         val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
         val interval = intervalPicker.value
         val time = cal.time.toString()

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="110dp"
     android:padding="24sp"
-    android:background="@color/dark_cv"
+    android:background="@drawable/recyclerview_background"
     tools:ignore="UseSwitchCompatOrMaterialXml">
 
     <TextView
@@ -21,7 +21,7 @@
     <LinearLayout
         android:id="@+id/alarm_details_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_toRightOf="@+id/row_id_tv">
 

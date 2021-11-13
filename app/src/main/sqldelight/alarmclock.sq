@@ -1,0 +1,16 @@
+CREATE TABLE alarmClocks {
+    id INTEGER PRIMARY KEY,
+    alarmName TEXT NOT NULL,
+    daysSelected TEXT NOT NULL,
+    weekly BOOLEAN,
+    startTime TEXT NOT NULL,
+    endTime TEXT NOT NULL,
+    sound TEXT NOT NULL,
+    intervalTime INTEGER,
+    timeAdded TEXT NOT NULL
+};
+
+CREATE INDEX alarm_clock_id ON alarmClocks(id)
+
+INSERT INTO alarmClocks(id, alarmName, daysSelected, weekly, startTime, endTime, sound, intervalTime, timeAdded)
+VALUES ()

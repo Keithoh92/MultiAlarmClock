@@ -27,16 +27,23 @@
 
         </androidx.appcompat.widget.Toolbar>
 
+        <LinearLayout
+            android:id="@+id/top_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_below="@+id/mytoolbar">
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardview_top_left"
-            android:layout_width="180dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="180dp"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="15dp"
+            android:layout_marginRight="7.5dp"
             app:cardBackgroundColor="#2B2A2A"
             app:cardCornerRadius="20dp"
-            app:cardElevation="12dp"
-            android:layout_below="@id/mytoolbar">
+            app:cardElevation="12dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -47,11 +54,11 @@
                     android:id="@+id/cardview_top_left_tv"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:text="Last used"
-                    android:textSize="20dp"
-                    android:textColor="@color/white"
                     android:fontFamily="sans-serif-medium"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:text="Last used"
+                    android:textColor="@color/white"
+                    android:textSize="20dp">
 
                 </TextView>
 
@@ -103,11 +110,11 @@
                     android:id="@+id/go_off_times"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
+                    android:layout_below="@id/divider2"
+                    android:layout_marginLeft="10dp"
                     android:text="Set Every: 5 MINS"
                     android:textColor="@color/white"
-                    android:layout_below="@id/divider2"
-                    android:textSize="16dp"
-                    android:layout_marginLeft="10dp">
+                    android:textSize="16dp">
 
                 </TextView>
 
@@ -143,12 +150,15 @@
 
         </androidx.cardview.widget.CardView>
 
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardview_top_right"
-            android:layout_width="180dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="180dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="7.5dp"
             app:cardBackgroundColor="#2B2A2A"
             app:cardCornerRadius="20dp"
             app:cardElevation="12dp"
@@ -166,27 +176,37 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
-                    android:text="New\nOne Time\nAlarm"
-                    android:textColor="@color/white"
+                    android:shadowColor="@color/dark_cv"
                     android:shadowDx="5"
                     android:shadowDy="5"
-                    android:shadowColor="@color/dark_cv"
+                    android:text="New\nOne Time\nAlarm"
+                    android:textColor="@color/white"
                     android:textSize="28dp">
 
                 </TextView>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/top2_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_below="@+id/top_linear_layout">
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardview_bottom_left"
-            android:layout_width="180dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="180dp"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="7.5dp"
             app:cardBackgroundColor="#2B2A2A"
             app:cardCornerRadius="20dp"
             app:cardElevation="12dp"
-            android:layout_below="@id/cardview_top_left">
+            >
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -211,15 +231,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardview_bottom_right"
-            android:layout_width="180dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="180dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="7.5dp"
             app:cardBackgroundColor="#2B2A2A"
             app:cardCornerRadius="20dp"
             app:cardElevation="12dp"
             android:clickable="true"
-            android:layout_below="@id/cardview_top_right"
             android:layout_alignParentEnd="true"
             android:focusable="true">
 
@@ -240,12 +261,13 @@
                 </TextView>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
+        </LinearLayout>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/db_alarms_cv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/cardview_bottom_left"
+            android:layout_below="@id/top2_linear_layout"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="15dp"
