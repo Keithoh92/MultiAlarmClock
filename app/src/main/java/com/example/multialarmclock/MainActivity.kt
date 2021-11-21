@@ -5,6 +5,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
+import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.os.Build
@@ -18,9 +19,11 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     var avd: AnimatedVectorDrawableCompat? = null
     var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
+    val adapter = com.example.multialarmclock.list.ListAdapter()
 
     //Setup for last used cardview
     private lateinit var daysChosen:TextView
@@ -55,6 +59,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var interval:TextView
     private lateinit var setButton:Button
     private lateinit var editButton:Button
+    private lateinit var switchButton:SwitchCompat
+    val myPrefs = HashMap<String, MutableLiveData<Boolean>>()
+
 
     private lateinit var cursor:Cursor
     private lateinit var dividerItemDecoration: DividerItemDecoration
@@ -74,19 +81,15 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        val adapter = com.example.multialarmclock.list.ListAdapter()
-//        val recyclerView = binding.recyclerview
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
-
+//        SeperatorDecoration
         recyclerView.addItemDecoration(DividerItemDecoration(
             applicationContext, LinearLayoutManager.VERTICAL
         ))
 
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-        mAlarmModel.readAllData.observe(this, Observer { alarm->
-            adapter.setData(alarm)
-        })
+        reloadAdapter()
 
         mAlarmModel.readLastEntered.observe(this, Observer { alarm->
             daysChosen.text = alarm.get(0).daysSelected
@@ -98,13 +101,8 @@ class MainActivity : AppCompatActivity() {
             }else{
                 interval.text = "Set Every "+alarm.get(0).interval+" mins"
             }
-//            editButton
-//            setButton
             Log.d("MainAct", alarm.get(0).daysSelected)
         })
-
-
-        val switchButton = findViewById<Switch>(R.id.my_switch)
 
         intitialiseFields();
 
@@ -116,9 +114,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @InternalCoroutinesApi
+    override fun onResume() {
+        super.onResume()
+        reloadAdapter()
+    }
+
     private fun openAlarmBuilder() {
         val startAlarmBuilderActivity = Intent(this, BuildNewAlarm::class.java)
         startActivity(startAlarmBuilderActivity)
+    }
+
+    @InternalCoroutinesApi
+    private fun reloadAdapter(){
+        mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mAlarmModel.readAllData.observe(this, Observer { alarm->
+            adapter.setData(alarm)
+        })
     }
 
     private fun intitialiseFields() {
@@ -136,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         binding.cardviewTopLeftTv
         binding.topRightCardviewTv
         binding.cardviewBottomLeftTv
-        binding.cardviewBottomRightTv
+        binding.cardviewBottomRight
 
         binding.setButton
         binding.editButton
@@ -166,14 +178,4 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-//    fun buttonEffect(button: View){
-//        cardviewEditButton.setOnTouchListener { v, event ->
-//            when(event.action){
-//                MotionEvent.ACTION_DOWN -> {
-//                    v.background.setColorFilter()
-//                }
-//            }
-//        }
-//    }
 }

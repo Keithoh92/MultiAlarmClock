@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.Ringtone
@@ -251,16 +253,17 @@ class BuildNewAlarm : AppCompatActivity() {
 
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-//        var alarmDays = arrayListOf<String>()
-//        var sb = StringBuilder()
+        var numOfAlarms = 0
+        val sharedPreference:SharedPreferences = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
+        mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mAlarmViewModel.readLastEntered.observe(this, {alarm->
+            numOfAlarms = alarm.get(0).id
+        })
+
         val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
         //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
         var alarmDays = getCheckedDays()                                                            //Days Selected
-//        var separator = ""
-//        for (i in alarmDays.indices){
-//            sb.append(separator+daysSelected[i])
-//            separator = ","//MON,TUES
-//        }
+
         var weekly = toggleOn.isChecked     //Is set to weekly?
         val startTime = picker.startTime.toString()   //07:00
         val endTime = picker.endTime.toString()    //08:00
@@ -270,7 +273,10 @@ class BuildNewAlarm : AppCompatActivity() {
         val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time)
         mAlarmViewModel.addAlarm(alarm)
         Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
-
+        val id = numOfAlarms+1
+        var editor = sharedPreference.edit()
+        editor.putBoolean(id.toString(),true)
+        editor.commit()
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
