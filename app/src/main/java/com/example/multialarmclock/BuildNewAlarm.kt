@@ -55,7 +55,7 @@ class BuildNewAlarm : AppCompatActivity() {
 
     val cal = Calendar.getInstance()
 
-    internal lateinit var startTimeTv:TextView
+
 //    internal lateinit var endTimeTv:TextView
     internal lateinit var alarmName:EditText
 
@@ -73,11 +73,15 @@ class BuildNewAlarm : AppCompatActivity() {
 
     internal lateinit var timeStart:String
     internal lateinit var timeEnd:String
-    internal lateinit var picker:TimeRangePicker
+    internal lateinit var startTimePicker:TimePicker
+    internal lateinit var endTimePicker:TimePicker
 //    internal lateinit var chooseTime:ImageButton
     internal lateinit var timeRangeCV:CardView
-    internal lateinit var starttimeTV:TextView
+
+    internal lateinit var startTimeTv:TextView
     internal lateinit var endTimeTV:TextView
+    internal var startTimeTemp:String? = null
+    internal var endTimeTemp:String? = null
 
     internal lateinit var rt_tv:TextView
     internal lateinit var ringtoneDefault:Ringtone
@@ -131,55 +135,47 @@ class BuildNewAlarm : AppCompatActivity() {
         cbDay6 = findViewById(R.id.cb_day6)
         cbDay7 = findViewById(R.id.cb_day7)
 
-        picker = findViewById(R.id.picker1)
+
         timeRangeCV = findViewById(R.id.time_range_picker)
-        startTimeTv = findViewById(R.id.start_time_tv)
-        endTimeTV = findViewById(R.id.end_time_tv)
 
-        picker.sliderColor = Color.BLUE
-        picker.clockFace = TimeRangePicker.ClockFace.APPLE
-        picker.clockLabelColor = Color.WHITE
-        picker.thumbSize = 100
-        picker.thumbSizeActiveGrow = 1.0f
-        picker.timeStepMinutes = 5
-        picker.startTimeMinutes = 0
-        picker.startTime = TimeRangePicker.Time(12,0)
-        picker.endTime = TimeRangePicker.Time(7,0)
-        startTimeTv.text = picker.startTime.toString()
-        endTimeTV.text = picker.endTime.toString()
 
-        picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
-            override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
-                // Do something on start dragging
-                if(thumb == TimeRangePicker.Thumb.START){
-                    startTimeTv.textSize = 20.0f
-                }
-                if(thumb == TimeRangePicker.Thumb.END){
-                    endTimeTV.textSize = 20.0f
-                }
-                return true // Return false to disallow the user from dragging a handle.
-            }
+//        picker.startTime = TimeRangePicker.Time(12,0)
+//        picker.endTime = TimeRangePicker.Time(7,0)
+//        startTimeTv.text = picker.startTime.toString()
+//        endTimeTV.text = picker.endTime.toString()
 
-            override fun onDragStop(thumb: TimeRangePicker.Thumb) {
-                startTimeTv.textSize = 15.0f
-                endTimeTV.textSize = 15.0f
-            }
-        })
-
-        picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
-            override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
-                Log.d("TimeRangePicker", "Duration: " + duration)
-            }
-
-            override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
-                endTimeTV.text = "End Time: ${endTime}"
-            }
-
-            override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
-                Log.d("TimeRangePicker", "Start time: " + startTime)
-                startTimeTv.text = "Start Time: ${startTime}"
-            }
-        })
+//        picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
+//            override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
+//                // Do something on start dragging
+//                if(thumb == TimeRangePicker.Thumb.START){
+//                    startTimeTv.textSize = 20.0f
+//                }
+//                if(thumb == TimeRangePicker.Thumb.END){
+//                    endTimeTV.textSize = 20.0f
+//                }
+//                return true // Return false to disallow the user from dragging a handle.
+//            }
+//
+//            override fun onDragStop(thumb: TimeRangePicker.Thumb) {
+//                startTimeTv.textSize = 15.0f
+//                endTimeTV.textSize = 15.0f
+//            }
+//        })
+//
+//        picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
+//            override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
+//                Log.d("TimeRangePicker", "Duration: " + duration)
+//            }
+//
+//            override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
+//                endTimeTV.text = "End Time: ${endTime}"
+//            }
+//
+//            override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
+//                Log.d("TimeRangePicker", "Start time: " + startTime)
+//                startTimeTv.text = "Start Time: ${startTime}"
+//            }
+//        })
 
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
 
@@ -246,11 +242,16 @@ class BuildNewAlarm : AppCompatActivity() {
 
         val saveButton = findViewById(R.id.save_button) as Button
         saveButton.setOnClickListener{
-            insertNewAlarmToDB()
+            if( startTimeTemp != null && endTimeTemp != null) {
+                insertNewAlarmToDB()
+            } else {
+                Toast.makeText(this, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
+            }
         }
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
         var numOfAlarms = 0
@@ -265,8 +266,8 @@ class BuildNewAlarm : AppCompatActivity() {
         var alarmDays = getCheckedDays()                                                            //Days Selected
 
         var weekly = toggleOn.isChecked     //Is set to weekly?
-        val startTime = picker.startTime.toString()   //07:00
-        val endTime = picker.endTime.toString()    //08:00
+        val startTime = "${startTimePicker.hour}:${startTimePicker.minute}"
+        val endTime = "${endTimePicker.hour}:${endTimePicker.minute}"
         val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
         val interval = intervalPicker.value
         val time = cal.time.toString()
@@ -274,12 +275,71 @@ class BuildNewAlarm : AppCompatActivity() {
         mAlarmViewModel.addAlarm(alarm)
         Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
         val id = numOfAlarms+1
+        Log.d("New Alarm no saved at: ", id.toString())
         var editor = sharedPreference.edit()
         editor.putBoolean(id.toString(),true)
         editor.commit()
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun onClickTime() {
+        startTimePicker = findViewById(R.id.picker1)
+        endTimePicker = findViewById(R.id.picker2)
+
+        startTimePicker.hour = 8
+        startTimePicker.minute = 0
+        endTimePicker.hour = 9
+        endTimePicker.minute = 0
+
+        startTimeTv = findViewById(R.id.start_time_tv)
+        endTimeTV = findViewById(R.id.end_time_tv)
+        startTimeTv.text = "Start Time: ${startTimePicker.hour}:${startTimePicker.minute}"
+        endTimeTV.text = "End Time: ${endTimePicker.hour}:${endTimePicker.minute}"
+
+        startTimePicker.setIs24HourView(true)
+        startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            val hour1 = if (hour < 10) "0" else hour
+            val min1 = if (minute < 10) "0" else minute
+            val startTimeMsg = "Start Time: $hour1:$min1"
+            startTimeTemp = "$hour1:$min1"
+            startTimeTv.text = startTimeMsg
+        }
+
+        endTimePicker.setIs24HourView(true)
+        endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            if (endTimeTV != null) {
+                val hour1 = if (hour < 10) "0" else hour
+                val min1 = if (minute < 10) "0" else minute
+                val endTimeMsg = "End Time: $hour1:$min1"
+                endTimeTemp = "$hour1:$min1"
+                endTimeTV.text = endTimeMsg
+            }
+        }
     }
 
     fun getCheckedDays(): String {

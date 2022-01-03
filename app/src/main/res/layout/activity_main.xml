@@ -290,15 +290,20 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/recyclerviewbg">
 
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_refresh_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scrollbars="vertical"
                     android:scrollbarAlwaysDrawVerticalTrack="true"
-                    >
+                    />
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-                </androidx.recyclerview.widget.RecyclerView>
             </RelativeLayout>
 
         </androidx.cardview.widget.CardView>

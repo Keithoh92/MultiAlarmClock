@@ -1,6 +1,7 @@
 package com.example.multialarmclock
 
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.RoomOpenHelper
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.data.AlarmDao
@@ -62,6 +64,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchButton:SwitchCompat
     val myPrefs = HashMap<String, MutableLiveData<Boolean>>()
 
+    private val swipeRefreshLayout:SwipeRefreshLayout by lazy {
+        findViewById(R.id.swipe_refresh_layout)
+    }
+
 
     private lateinit var cursor:Cursor
     private lateinit var dividerItemDecoration: DividerItemDecoration
@@ -88,8 +94,14 @@ class MainActivity : AppCompatActivity() {
             applicationContext, LinearLayoutManager.VERTICAL
         ))
 
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            reloadAdapter()
+        }
+
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         reloadAdapter()
+
 
         mAlarmModel.readLastEntered.observe(this, Observer { alarm->
             daysChosen.text = alarm.get(0).daysSelected
@@ -118,6 +130,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         reloadAdapter()
+        val editor = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
     }
 
     private fun openAlarmBuilder() {
@@ -177,5 +190,9 @@ class MainActivity : AppCompatActivity() {
             avd2!!.start()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun setItemTouchListener(){
+
     }
 }

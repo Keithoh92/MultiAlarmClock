@@ -25,6 +25,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.multialarmclock.MainActivity
 import com.example.multialarmclock.prefs
+import java.lang.ref.WeakReference
 
 
 class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
@@ -34,6 +35,31 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     class MyViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         val editor = itemView.context.getSharedPreferences("MyAlarm", Context.MODE_PRIVATE)
+        private val view = WeakReference(itemView)
+        private lateinit var id:TextView
+        private lateinit var name:TextView
+        private lateinit var timeRange:TextView
+        private lateinit var interval:TextView
+        private lateinit var days:TextView
+
+        var index = 0
+        var onDeleteClick:((RecyclerView.ViewHolder) -> Unit )? = null
+
+        init {
+            view.get()?.let {
+                it.setOnClickListener{
+                    if (view.get()?.scrollX != 0){
+                        view.get()?.scrollTo(0, 0)
+                    }
+                }
+
+                id = it.findViewById(R.id.row_id_tv)
+                name = it.findViewById(R.id.alarm_name)
+                timeRange = it.findViewById(R.id.time_range)
+                interval = it.findViewById(R.id.interval)
+                days = it.findViewById(R.id.days)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -57,14 +83,16 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
         val switchButton = holder.itemView.findViewById<SwitchCompat>(R.id.my_switch)
 
-        val editor = holder.itemView.context.getSharedPreferences("MyAlarm", Context.MODE_PRIVATE)
+        val editor = holder.itemView.context.getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
         val checking = editor.getBoolean("$currentItem.id", false)
+        Log.d("Alarm No.: ", currentItem.id.toString())
         if(checking){
             switchButton.isChecked
         }else{
             !switchButton.isChecked
         }
         switchButton.setOnCheckedChangeListener{buttonView, isChecked ->
+            Log.d("Toggled Alarm no: ", currentItem.id.toString())
             val editThisPref = editor.edit()
             if(isChecked){
                 editThisPref.putBoolean("$currentItem.id", true)
