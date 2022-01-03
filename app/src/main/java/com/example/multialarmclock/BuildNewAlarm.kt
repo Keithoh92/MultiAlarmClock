@@ -125,6 +125,8 @@ class BuildNewAlarm : AppCompatActivity() {
             toggleOff.isChecked = false
         }
 
+        onClickTime()
+
 
         ///////////////////////// ALARM DAY CHOICES /////////////////////////////////////
         cbDay1 = findViewById(R.id.cb_day1)
@@ -289,15 +291,18 @@ class BuildNewAlarm : AppCompatActivity() {
         startTimePicker = findViewById(R.id.picker1)
         endTimePicker = findViewById(R.id.picker2)
 
+
         startTimePicker.hour = 8
         startTimePicker.minute = 0
         endTimePicker.hour = 9
         endTimePicker.minute = 0
 
+
         startTimeTv = findViewById(R.id.start_time_tv)
         endTimeTV = findViewById(R.id.end_time_tv)
-        startTimeTv.text = "Start Time: ${startTimePicker.hour}:${startTimePicker.minute}"
-        endTimeTV.text = "End Time: ${endTimePicker.hour}:${endTimePicker.minute}"
+
+        startTimeTv.text = "Start Time: 8:00"
+        endTimeTV.text = "End Time: 9:00"
 
         startTimePicker.setIs24HourView(true)
         startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
@@ -312,10 +317,10 @@ class BuildNewAlarm : AppCompatActivity() {
                 }
                 else -> am_pm = "AM"
             }
-            val hour1 = if (hour < 10) "0" else hour
-            val min1 = if (minute < 10) "0" else minute
-            val startTimeMsg = "Start Time: $hour1:$min1"
-            startTimeTemp = "$hour1:$min1"
+            val hour1 = if (hour < 10) "0$hour" else hour
+            val min1 = if (minute < 10) "00" else minute
+            val startTimeMsg = "Start Time: $hour1:$min1 $am_pm"
+            startTimeTemp = "$hour1:$min1 $am_pm"
             startTimeTv.text = startTimeMsg
         }
 
@@ -333,10 +338,10 @@ class BuildNewAlarm : AppCompatActivity() {
                 else -> am_pm = "AM"
             }
             if (endTimeTV != null) {
-                val hour1 = if (hour < 10) "0" else hour
-                val min1 = if (minute < 10) "0" else minute
-                val endTimeMsg = "End Time: $hour1:$min1"
-                endTimeTemp = "$hour1:$min1"
+                val hour1 = if (hour < 10) "0$hour" else hour
+                val min1 = if (minute < 10) "00" else minute
+                val endTimeMsg = "End Time: $hour1:$min1 $am_pm"
+                endTimeTemp = "$hour1:$min1 $am_pm"
                 endTimeTV.text = endTimeMsg
             }
         }

@@ -93,7 +93,7 @@
 
                         <TextView
                             android:id="@+id/start_time_tv"
-                            android:layout_width="130dp"
+                            android:layout_width="145dp"
                             android:layout_height="130dp"
                             android:textSize="15sp"
                             android:gravity="center"
@@ -121,7 +121,7 @@
 
                         <TextView
                             android:id="@+id/end_time_tv"
-                            android:layout_width="130dp"
+                            android:layout_width="145dp"
                             android:layout_height="130dp"
                             android:gravity="center"
                             android:textSize="15sp"
