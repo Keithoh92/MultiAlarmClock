@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext, LinearLayoutManager.VERTICAL
         ))
 
+
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
             reloadAdapter()

@@ -65,7 +65,7 @@
                     android:inputType="textPersonName"
                     android:outlineProvider="none"
                     android:textSize="20sp"
-                    android:textColorHint="@color/white"
+                    android:textColorHint="@color/light_grey"
                     android:textColor="@color/white"
                     >
 

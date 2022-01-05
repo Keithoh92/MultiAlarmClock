@@ -18,6 +18,7 @@ import java.lang.StringBuilder
 import android.content.Context.MODE_PRIVATE
 
 import android.content.SharedPreferences
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -41,6 +42,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         private lateinit var timeRange:TextView
         private lateinit var interval:TextView
         private lateinit var days:TextView
+        private lateinit var mListener: AdapterView.OnItemClickListener;
 
         var index = 0
         var onDeleteClick:((RecyclerView.ViewHolder) -> Unit )? = null
@@ -83,26 +85,25 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
         val switchButton = holder.itemView.findViewById<SwitchCompat>(R.id.my_switch)
 
-        val editor = holder.itemView.context.getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
-        val checking = editor.getBoolean("$currentItem.id", false)
+        val sharedPreferences = holder.itemView.context.getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        switchButton.isChecked = sharedPreferences.getBoolean("$currentItem.id", false)
         Log.d("Alarm No.: ", currentItem.id.toString())
-        if(checking){
-            switchButton.isChecked
-        }else{
-            !switchButton.isChecked
-        }
-        switchButton.setOnCheckedChangeListener{buttonView, isChecked ->
+
+        switchButton.setOnCheckedChangeListener{ _, isChecked ->
             Log.d("Toggled Alarm no: ", currentItem.id.toString())
-            val editThisPref = editor.edit()
             if(isChecked){
-                editThisPref.putBoolean("$currentItem.id", true)
-                editThisPref.commit()
+                editor.putBoolean("$currentItem.id", true)
             }else{
-                editThisPref.putBoolean("$currentItem.id", false)
-                editThisPref.commit()
+                editor.putBoolean("$currentItem.id", false)
             }
+            editor.commit()
         }
     }
+
+//    interface OnItemClickListener {
+//        public void onItemClickListener(view: View, position: Int);
+//    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setData(alarm: List<BuildNewAlarmModel>){
