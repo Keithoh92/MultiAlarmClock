@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:background="@color/dark_cv"
+    tools:ignore="UseSwitchCompatOrMaterialXml"
+    android:id="@+id/outer_layout">
+
+    <!--    <FrameLayout-->
+    <!--        android:id="@+id/outer_frame_layout"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent">-->
+
+    <!--    </FrameLayout>-->
+    <FrameLayout
+        android:id="@+id/innser_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/row_id_tv"
+            android:layout_width="10dp"
+            android:layout_height="40dp"
+            android:text="1"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="20sp">
+        </TextView>
+
+        <LinearLayout
+            android:id="@+id/alarm_details_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/row_id_tv">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
+
+
+                <TextView
+                    android:id="@+id/alarm_name"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Alarm Name"
+                    android:textColor="@color/blue"
+                    android:layout_gravity="clip_vertical"
+                    android:textSize="15sp"
+                    >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/days"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Mon, Tue, Wed, \nFri, Sat, Sun"
+                    android:textScaleX="1.2"
+                    android:textSize="12sp"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/white">
+                </TextView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight=".8"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginEnd="0dp"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:id="@+id/interval"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Interval: 10 Mins"
+                    android:textSize="12sp"
+                    android:textColor="@color/white">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/time_range"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="07:00 - 08:00"
+                    android:textSize="15sp"
+                    android:layout_marginTop="5dp"
+                    android:layout_gravity="clip_vertical"
+                    android:textColor="@color/white">
+                </TextView>
+
+
+            </LinearLayout>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/my_switch"
+                android:layout_width="0dp"
+                android:layout_weight=".5"
+                android:layout_height="50dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                app:trackTint="@color/switch_track_selector"
+                app:thumbTint="@color/switch_thumb_selector"
+                android:layout_toEndOf="@+id/alarm_details_layout">
+            </androidx.appcompat.widget.SwitchCompat>
+        </LinearLayout>
+        <!--    <TextView-->
+        <!--        android:layout_width="100dp"-->
+        <!--        android:layout_height="match_parent"-->
+        <!--        android:gravity="center"-->
+        <!--        android:text="Delete"-->
+        <!--        android:layout_toRightOf="@+id/alarm_details_layout"-->
+        <!--        />-->
+
+    </FrameLayout>
+    <TextView
+        android:id="@+id/textview_delete"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Delete"
+        app:layout_constraintStart_toEndOf="@+id/outer_layout"
+        />
+
+    <View
+        android:background="#ddd"
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

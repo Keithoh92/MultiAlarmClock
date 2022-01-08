@@ -49,9 +49,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     @InternalCoroutinesApi
     private lateinit var mAlarmModel: AlarmViewModel
-    var settings: ImageButton? = null
-    var avd: AnimatedVectorDrawableCompat? = null
-    var avd2: AnimatedVectorDrawable? = null
     var toolbar: Toolbar? = null
     val adapter = com.example.multialarmclock.list.ListAdapter()
 
@@ -62,12 +59,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var setButton:Button
     private lateinit var editButton:Button
     private lateinit var switchButton:SwitchCompat
-    val myPrefs = HashMap<String, MutableLiveData<Boolean>>()
 
     private val swipeRefreshLayout:SwipeRefreshLayout by lazy {
         findViewById(R.id.swipe_refresh_layout)
     }
 
+    private val recyclerView:RecyclerView by lazy {
+        findViewById(R.id.recyclerview)
+    }
 
     private lateinit var cursor:Cursor
     private lateinit var dividerItemDecoration: DividerItemDecoration
@@ -86,14 +85,13 @@ class MainActivity : AppCompatActivity() {
         binding.mytoolbar
         setSupportActionBar(toolbar)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
-//        SeperatorDecoration
+
+        //SeparatorDecoration
         recyclerView.addItemDecoration(DividerItemDecoration(
             applicationContext, LinearLayoutManager.VERTICAL
         ))
-
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
@@ -103,7 +101,9 @@ class MainActivity : AppCompatActivity() {
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         reloadAdapter()
 
+        setOnItemTouchHelper()
 
+        //1st card view - set last created alarm details to view
         mAlarmModel.readLastEntered.observe(this, Observer { alarm->
             daysChosen.text = alarm.get(0).daysSelected
             val st = alarm.get(0).startTime
@@ -127,6 +127,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setOnItemTouchHelper() {
+        //TODO("Not yet implemented")
+    }
+
     @InternalCoroutinesApi
     override fun onResume() {
         super.onResume()
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(startAlarmBuilderActivity)
     }
 
+    //fill list with DB alarm data
     @InternalCoroutinesApi
     private fun reloadAdapter(){
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
@@ -180,20 +185,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val drawable = item.icon
-        if (drawable is AnimatedVectorDrawable) {
-            avd = drawable as AnimatedVectorDrawableCompat
-            avd!!.start()
-        } else if (drawable is AnimatedVectorDrawable) {
-            avd2 = drawable
-            avd2!!.start()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    fun setItemTouchListener(){
-
-    }
+//    fun setItemTouchListener(){
+//
+//    }
 }

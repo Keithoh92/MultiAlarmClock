@@ -6,7 +6,15 @@
     android:layout_height="110dp"
     android:padding="24sp"
     android:background="@color/dark_cv"
-    tools:ignore="UseSwitchCompatOrMaterialXml">
+    tools:ignore="UseSwitchCompatOrMaterialXml"
+    android:id="@+id/outer_layout">
+    
+<!--    <FrameLayout-->
+<!--        android:id="@+id/outer_frame_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+
+<!--    </FrameLayout>-->
 
     <TextView
         android:id="@+id/row_id_tv"
