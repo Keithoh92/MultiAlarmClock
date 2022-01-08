@@ -24,15 +24,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import com.example.multialarmclock.MainActivity
+import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.prefs
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.lang.ref.WeakReference
 
 
-class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
+class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     private var alarmList = mutableListOf<BuildNewAlarmModel>()
     private lateinit var day:String
+    @InternalCoroutinesApi
+//    private lateinit var mAlarmModel: AlarmViewModel
+    private var mContext = context
+
 
     class MyViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         val editor = itemView.context.getSharedPreferences("MyAlarm", Context.MODE_PRIVATE)
@@ -44,6 +51,9 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         private lateinit var days:TextView
         private lateinit var mListener: AdapterView.OnItemClickListener;
         private lateinit var textviewDelete: TextView
+
+        
+
 
         var index = 0
         var onDeleteClick:((RecyclerView.ViewHolder) -> Unit )? = null
@@ -80,12 +90,17 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.custom_row, parent, false))
     }
 
+    @InternalCoroutinesApi
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem = alarmList[position]
 
+//        mAlarmModel = ViewModelProvider().get(AlarmViewModel::class.java)
+        holder.updateView()
+
         holder.onDeleteClick = {
             removeItem(it)
+            removeFromDB(currentItem.id)
         }
 
         holder.itemView.findViewById<TextView>(R.id.row_id_tv).text = currentItem.id.toString()
@@ -117,11 +132,19 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         }
     }
 
+    @InternalCoroutinesApi
+    private fun removeFromDB(id: Int) {
+        (mContext as MainActivity).deleteAlarm(id)
+    }
+
     private fun removeItem(it: RecyclerView.ViewHolder) {
+
+        val position = it.adapterPosition
         //remove data
-        alarmList.removeAt(it.adapterPosition)
+        alarmList.removeAt(position)
+
         //remove item
-        notifyItemRemoved(it.adapterPosition)
+        notifyItemRemoved(position)
     }
 
 //    interface OnItemClickListener {
@@ -130,6 +153,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun setData(alarm: List<BuildNewAlarmModel>){
+        this.alarmList.clear()
         this.alarmList = alarm as MutableList<BuildNewAlarmModel>
         notifyDataSetChanged()
     }
@@ -137,6 +161,12 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     override fun getItemCount(): Int {
         return alarmList.size
     }
+
+//    fun reload(list: List<BuildNewAlarmModel>) {
+//        this.alarmList.clear()
+//        this.alarmList.addAll(list)
+//        notifyDataSetChanged()
+//    }
 
 
 }

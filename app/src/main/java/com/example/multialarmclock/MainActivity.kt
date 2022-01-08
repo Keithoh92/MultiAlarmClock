@@ -6,6 +6,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.ShapeDrawable
@@ -28,6 +29,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.RoomOpenHelper
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     @InternalCoroutinesApi
     private lateinit var mAlarmModel: AlarmViewModel
     var toolbar: Toolbar? = null
-    val adapter = com.example.multialarmclock.list.ListAdapter()
+    val adapter = com.example.multialarmclock.list.ListAdapter(this)
 
     //Setup for last used cardview
     private lateinit var daysChosen:TextView
@@ -128,7 +130,115 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setOnItemTouchHelper() {
-        //TODO("Not yet implemented")
+
+        ItemTouchHelper(object : ItemTouchHelper.Callback() {
+
+            // the limit of swipe same as delete button in item 100dp
+            private val limitScrollX = dpToPx(100f, this@MainActivity)
+            private var currentScrollX= 0
+            private var currentScrollXWhenInActive = 0
+            private var initXWhenInActive = 0f
+            private var firstInActive = false
+
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val dragFlags = 0
+                val swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                return makeMovementFlags(dragFlags, swipeFlags)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
+                return Integer.MAX_VALUE.toFloat()
+            }
+
+            override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
+                return Integer.MIN_VALUE.toFloat()
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    if(dX == 0f) {
+                        currentScrollX = viewHolder.itemView.scrollX
+                        firstInActive = true
+                    }
+
+                    if(isCurrentlyActive) {
+                        // swipe with finger
+                        var scrollOffset = currentScrollX + (-dX).toInt()
+                        if(scrollOffset > limitScrollX) {
+                            scrollOffset = limitScrollX
+                        }
+                        else if (scrollOffset < 0) {
+                            scrollOffset = 0
+                        }
+
+                        viewHolder.itemView.scrollTo(scrollOffset, 0)
+                    }
+                    else {
+                        // sqipe with auto animation
+                        if (firstInActive) {
+                            firstInActive = false
+                            currentScrollXWhenInActive = viewHolder.itemView.scrollX
+                            initXWhenInActive = dX
+                        }
+
+                        if (viewHolder.itemView.scrollX < limitScrollX) {
+                            viewHolder.itemView.scrollTo((currentScrollXWhenInActive * dX / initXWhenInActive).toInt(), 0)
+                        }
+                    }
+                }
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+
+                if(viewHolder.itemView.scrollX > limitScrollX) {
+                    viewHolder.itemView.scrollTo(limitScrollX, 0)
+                }
+                else if (viewHolder.itemView.scrollX < 0) {
+                    viewHolder.itemView.scrollTo(0, 0)
+                }
+
+            }
+
+
+
+        }).apply {
+            attachToRecyclerView(recyclerView)
+        }
+
+    }
+
+    private fun dpToPx(dpValue: Float, context: Context): Int {
+        return (dpValue * context.resources.displayMetrics.density).toInt()
+    }
+
+    @InternalCoroutinesApi
+    fun deleteAlarm(id: Int) {
+        mAlarmModel.deleteAlarm(id)
     }
 
     @InternalCoroutinesApi

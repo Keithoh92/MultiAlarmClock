@@ -34,4 +34,10 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun deleteAlarm(id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAlarm(id)
+        }
+    }
+
 }

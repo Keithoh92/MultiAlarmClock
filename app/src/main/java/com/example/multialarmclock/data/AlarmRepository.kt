@@ -12,4 +12,8 @@ class AlarmRepository(private val alarmDao: AlarmDao) {
         alarmDao.addAlarm(buildNewAlarmModel)
     }
 
+    suspend fun deleteAlarm(id: Int) {
+        alarmDao.deleteById(id)
+    }
+
 }
