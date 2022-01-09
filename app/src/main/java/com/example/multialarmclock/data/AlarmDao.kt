@@ -19,4 +19,8 @@ interface AlarmDao {
 
     @Query("SELECT * FROM my_alarms ORDER BY id DESC limit 1")
     fun readLastEntered(): LiveData<List<BuildNewAlarmModel>>
+
+    @Query("DELETE FROM my_alarms WHERE id = :alarmId")
+    fun deleteById(alarmId: Int)
+
 }

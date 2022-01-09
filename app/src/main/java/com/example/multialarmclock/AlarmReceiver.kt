@@ -15,9 +15,9 @@ class AlarmReceiver: BroadcastReceiver(){
         const val NOTIFICATION_CHANNEL_ID = "1000"
     }
 
-    override fun onReceive(p0: Context, p1: Intent?) {
-        createNotificationChannel(p0)
-        notifyNotification(p0)
+    override fun onReceive(context: Context, intent: Intent?) {
+        createNotificationChannel(context)
+        notifyNotification(context)
     }
 
     private fun createNotificationChannel(context: Context) {

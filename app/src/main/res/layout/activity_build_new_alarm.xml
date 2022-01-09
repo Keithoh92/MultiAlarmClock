@@ -13,13 +13,9 @@
             type="com.example.multialarmclock.classes.TimeViewModel" />
     </data>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".BuildNewAlarm"
-        android:background="#000">
 
         <LinearLayout
+            android:id="@+id/outer_most_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#000"
@@ -41,7 +37,7 @@
             <RelativeLayout
                 android:id="@+id/text_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -69,17 +65,117 @@
                     android:inputType="textPersonName"
                     android:outlineProvider="none"
                     android:textSize="20sp"
-                    android:textColorHint="@color/white"
+                    android:textColorHint="@color/light_grey"
                     android:textColor="@color/white"
                     >
 
                 </EditText>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/time_range_picker"
+                    android:layout_width="match_parent"
+                    android:layout_height="270dp"
+                    app:cardCornerRadius="25dp"
+                    android:backgroundTint="@color/dark_cv"
+                    android:layout_margin="5dp"
+                    android:layout_below="@+id/edit_name"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/start_time_tv"
+                            android:layout_width="145dp"
+                            android:layout_height="130dp"
+                            android:textSize="15sp"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            >
+                        </TextView>
+
+                        <TimePicker
+                            android:id="@+id/picker1"
+                            android:layout_width="match_parent"
+                            android:layout_height="130dp"
+                            android:paddingBottom="10dp"
+                            android:layout_marginTop="10dp"
+                            android:timePickerMode="spinner"
+                            android:theme="@style/TimePickerTheme"
+                            >
+
+                        </TimePicker>
+                    </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/end_time_tv"
+                            android:layout_width="145dp"
+                            android:layout_height="130dp"
+                            android:gravity="center"
+                            android:textSize="15sp"
+                            android:textColor="@color/white">
+                        </TextView>
+
+                            <TimePicker
+                                android:id="@+id/picker2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="10dp"
+                                android:layout_marginTop="10dp"
+                                android:timePickerMode="spinner"
+                                android:theme="@style/TimePickerTheme"
+                               >
+
+                            </TimePicker>
+
+                        </LinearLayout>
+
+<!--                    <TimePicker-->
+<!--                        android:id="@+id/picker1"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:paddingBottom="10dp"-->
+<!--                        android:layout_marginTop="10dp"-->
+<!--                        android:numbersTextColor="@color/white"-->
+<!--                        android:timePickerMode="spinner"-->
+<!--                        android:background="@color/dark_cv"-->
+<!--                        android:numbersSelectorColor="@color/blue"-->
+<!--                        android:numbersBackgroundColor="@color/light_grey">-->
+
+<!--                    </TimePicker>-->
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </RelativeLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:context=".BuildNewAlarm"
+                android:background="#000">
+
+            <RelativeLayout
+                android:id="@+id/text_layout2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.cardview.widget.CardView
                     android:id="@+id/pick_days_cv"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
-                    android:layout_below="@id/edit_name"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="10dp"
@@ -91,9 +187,7 @@
                         android:id="@+id/layout_for_buttons"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:layout_below="@id/edit_name"
-                        android:layout_gravity="center_vertical"
-                        >
+                        android:layout_gravity="center_vertical">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -295,93 +389,12 @@
                 </androidx.cardview.widget.CardView>
 
                 <!--         START CARDVIEW HERE                       -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/pick_time_cv"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_below="@id/pick_days_cv"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:backgroundTint="@color/dark_cv"
-                    app:cardCornerRadius="25dp">
-
-                    <LinearLayout
-                        android:id="@+id/time_button_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp">
-
-                        <Button
-                            android:id="@+id/open_time_picker_start"
-                            android:layout_height="50dp"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:text="Select Start Time"
-                            android:textColor="#1a51ed"
-                            android:layout_marginRight="2dp"
-                            android:background="@drawable/button_background1">
-
-                        </Button>
-
-                        <Button
-                            android:id="@+id/open_time_picker_end"
-                            android:layout_height="50dp"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:text="Select End Time"
-                            android:textColor="#1a51ed"
-                            android:layout_marginLeft="2dp"
-                            android:background="@drawable/button_background1">
-
-                        </Button>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/time_tvs"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:layout_gravity="bottom">
-
-                        <TextView
-                            android:id="@+id/start_time_tv"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="10dp"
-                            android:text="08:00"
-                            android:textColor="@color/white"
-                            android:gravity="center"
-                            android:textSize="30sp">
-
-                        </TextView>
-
-                        <TextView
-                            android:id="@+id/end_time_tv"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="10dp"
-                            android:text='@{timeViewModel.theHour != null ? timeViewModel.getTime : "08:00"}'
-                            android:textColor="@color/white"
-                            android:gravity="center"
-                            android:textSize="30sp">
-
-                        </TextView>
-
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
 
                 <LinearLayout
                     android:id="@+id/interval_linear_layout"
                     android:layout_width="match_parent"
                     android:layout_height="130dp"
-                    android:layout_below="@+id/pick_time_cv">
+                    android:layout_below="@+id/pick_days_cv">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/new_cardview2"
@@ -533,20 +546,28 @@
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
 
-
                 <Button
                     android:id="@+id/save_button"
                     android:layout_width="100dp"
                     android:layout_height="50dp"
                     android:text="save"
-                    android:layout_marginTop="20dp"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/dark_cv"
                     android:layout_below="@+id/interval_linear_layout">
 
                 </Button>
 
             </RelativeLayout>
+            </ScrollView>
 
+<!--            <com.google.android.material.bottomnavigation.BottomNavigationView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="60dp"-->
+<!--                android:layout_gravity="bottom"-->
+<!--                >-->
+
+<!--            </com.google.android.material.bottomnavigation.BottomNavigationView>-->
         </LinearLayout>
 
-    </ScrollView>
 </layout>

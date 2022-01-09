@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -16,6 +20,7 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +34,8 @@ import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
+import nl.joery.timerangepicker.TimeRangePicker
+import nl.joery.timerangepicker.TimeRangePicker.Thumb.START
 import java.lang.reflect.Array.get
 import java.sql.Time
 import java.text.SimpleDateFormat
@@ -48,8 +55,8 @@ class BuildNewAlarm : AppCompatActivity() {
 
     val cal = Calendar.getInstance()
 
-    internal lateinit var startTimeTv:TextView
-    internal lateinit var endTimeTv:TextView
+
+//    internal lateinit var endTimeTv:TextView
     internal lateinit var alarmName:EditText
 
     internal lateinit var toggleOn:RadioButton
@@ -66,10 +73,19 @@ class BuildNewAlarm : AppCompatActivity() {
 
     internal lateinit var timeStart:String
     internal lateinit var timeEnd:String
+    internal lateinit var startTimePicker:TimePicker
+    internal lateinit var endTimePicker:TimePicker
+//    internal lateinit var chooseTime:ImageButton
+    internal lateinit var timeRangeCV:CardView
+
+    internal lateinit var startTimeTv:TextView
+    internal lateinit var endTimeTV:TextView
+    internal var startTimeTemp:String? = null
+    internal var endTimeTemp:String? = null
 
     internal lateinit var rt_tv:TextView
     internal lateinit var ringtoneDefault:Ringtone
-    internal lateinit var chosenRingtone:Ringtone
+    internal var chosenRingtone:Ringtone? = null
     internal lateinit var currentRingtone:Uri
     var chosenRTUri:Uri?=null
     internal lateinit var intervalPicker:NumberPicker
@@ -109,6 +125,8 @@ class BuildNewAlarm : AppCompatActivity() {
             toggleOff.isChecked = false
         }
 
+        onClickTime()
+
 
         ///////////////////////// ALARM DAY CHOICES /////////////////////////////////////
         cbDay1 = findViewById(R.id.cb_day1)
@@ -119,39 +137,47 @@ class BuildNewAlarm : AppCompatActivity() {
         cbDay6 = findViewById(R.id.cb_day6)
         cbDay7 = findViewById(R.id.cb_day7)
 
-        //////////////////////////////////      ALARM TIME LOGIC  ///////////////////////////////////////
-        val startButton = findViewById<Button>(R.id.open_time_picker_start)
-        val endButton = findViewById<Button>(R.id.open_time_picker_end)
 
-        startTimeTv = findViewById(R.id.start_time_tv)
-        endTimeTv = findViewById(R.id.end_time_tv)
+        timeRangeCV = findViewById(R.id.time_range_picker)
 
-        val minute = 0
-        startButton.setOnClickListener{
-            val timeSetlistener = TimePickerDialog.OnTimeSetListener{
-                    timePicker, hour, minute ->
-                cal.set(Calendar.HOUR_OF_DAY, hour)
-                cal.set(Calendar.MINUTE, minute)
-                startTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
-                myTimeDisplayViewmodel.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE))
-                timeStart = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
-                timeEnd = endTimeTv.text.toString()
-                Log.d("tti", timeStart)
-            }
-            TimePickerDialog(this, timeSetlistener, 7, 0, true).show()
-        }
 
-        endButton.setOnClickListener{
-            val timeSetlistener = TimePickerDialog.OnTimeSetListener{
-                    timePicker, hour, minute ->
-                cal.set(Calendar.HOUR_OF_DAY, hour)
-                cal.set(Calendar.MINUTE, minute)
-                endTimeTv.text = SimpleDateFormat("HH:mm").format(cal.time)
-                timeEnd = formatTimeForDB(cal.get(Calendar.HOUR),cal.get(Calendar.MINUTE))
-                Log.d("Testing endtimesb", timeEnd)
-            }
-            TimePickerDialog(this, timeSetlistener, 8, 0, true).show()
-        }
+//        picker.startTime = TimeRangePicker.Time(12,0)
+//        picker.endTime = TimeRangePicker.Time(7,0)
+//        startTimeTv.text = picker.startTime.toString()
+//        endTimeTV.text = picker.endTime.toString()
+
+//        picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
+//            override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
+//                // Do something on start dragging
+//                if(thumb == TimeRangePicker.Thumb.START){
+//                    startTimeTv.textSize = 20.0f
+//                }
+//                if(thumb == TimeRangePicker.Thumb.END){
+//                    endTimeTV.textSize = 20.0f
+//                }
+//                return true // Return false to disallow the user from dragging a handle.
+//            }
+//
+//            override fun onDragStop(thumb: TimeRangePicker.Thumb) {
+//                startTimeTv.textSize = 15.0f
+//                endTimeTV.textSize = 15.0f
+//            }
+//        })
+//
+//        picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
+//            override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
+//                Log.d("TimeRangePicker", "Duration: " + duration)
+//            }
+//
+//            override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
+//                endTimeTV.text = "End Time: ${endTime}"
+//            }
+//
+//            override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
+//                Log.d("TimeRangePicker", "Start time: " + startTime)
+//                startTimeTv.text = "Start Time: ${startTime}"
+//            }
+//        })
 
         //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
 
@@ -181,7 +207,7 @@ class BuildNewAlarm : AppCompatActivity() {
             if(chosenRingtone == null){
                 ringtoneDefault.play()
             }else{
-                chosenRingtone.play()
+                chosenRingtone!!.play()
             }
             playButton.visibility = View.INVISIBLE
             stopButton.visibility = View.VISIBLE
@@ -190,7 +216,7 @@ class BuildNewAlarm : AppCompatActivity() {
             if(chosenRingtone == null){
                 ringtoneDefault.stop()
             }else{
-                chosenRingtone.stop()
+                chosenRingtone!!.stop()
             }
             stopButton.visibility = View.INVISIBLE
             playButton.visibility = View.VISIBLE
@@ -218,36 +244,105 @@ class BuildNewAlarm : AppCompatActivity() {
 
         val saveButton = findViewById(R.id.save_button) as Button
         saveButton.setOnClickListener{
-            insertNewAlarmToDB()
+            if( startTimeTemp != null && endTimeTemp != null) {
+                insertNewAlarmToDB()
+            } else {
+                Toast.makeText(this, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
+            }
         }
 
     }////////////////////// END OF ON CREATE ///////////////////////////
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-//        var alarmDays = arrayListOf<String>()
-//        var sb = StringBuilder()
+        var numOfAlarms = 0
+        val sharedPreference:SharedPreferences = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
+        mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mAlarmViewModel.readLastEntered.observe(this, {alarm->
+            numOfAlarms = alarm.get(0).id
+        })
+
         val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
         //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
         var alarmDays = getCheckedDays()                                                            //Days Selected
-//        var separator = ""
-//        for (i in alarmDays.indices){
-//            sb.append(separator+daysSelected[i])
-//            separator = ","//MON,TUES
-//        }
+
         var weekly = toggleOn.isChecked     //Is set to weekly?
-        val startTime = timeStart   //07:00
-        val endTime = timeEnd    //08:00
+        val startTime = if(startTimePicker.minute < 10) "${startTimePicker.hour}:0${startTimePicker.minute}" else "${startTimePicker.hour}:${startTimePicker.minute}"
+        val endTime = if(endTimePicker.minute < 10) "${endTimePicker.hour}:0${endTimePicker.minute}" else "${endTimePicker.hour}:${endTimePicker.minute}"
         val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
         val interval = intervalPicker.value
         val time = cal.time.toString()
         val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time)
         mAlarmViewModel.addAlarm(alarm)
         Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
-
+        val id = numOfAlarms+1
+        Log.d("New Alarm no saved at: ", id.toString())
+        var editor = sharedPreference.edit()
+        editor.putBoolean(id.toString(),true)
+        editor.commit()
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun onClickTime() {
+        startTimePicker = findViewById(R.id.picker1)
+        endTimePicker = findViewById(R.id.picker2)
+
+
+        startTimePicker.hour = 8
+        startTimePicker.minute = 0
+        endTimePicker.hour = 9
+        endTimePicker.minute = 0
+
+
+        startTimeTv = findViewById(R.id.start_time_tv)
+        endTimeTV = findViewById(R.id.end_time_tv)
+
+        startTimeTv.text = "Start Time: 8:00 AM"
+        endTimeTV.text = "End Time: 9:00 AM"
+
+        startTimePicker.setIs24HourView(true)
+        startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            val min1 = if (minute < 10) "00" else minute
+            val startTimeMsg = "Start Time: $hour:$min1 $am_pm"
+            startTimeTemp = "$hour:$min1 $am_pm"
+            startTimeTv.text = startTimeMsg
+        }
+
+        endTimePicker.setIs24HourView(true)
+        endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            if (endTimeTV != null) {
+                val min1 = if (minute < 10) "00" else minute
+                val endTimeMsg = "End Time: $hour:$min1 $am_pm"
+                endTimeTemp = "$hour:$min1 $am_pm"
+                endTimeTV.text = endTimeMsg
+            }
+        }
     }
 
     fun getCheckedDays(): String {
