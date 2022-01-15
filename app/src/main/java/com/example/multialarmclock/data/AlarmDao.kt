@@ -23,4 +23,6 @@ interface AlarmDao {
     @Query("DELETE FROM my_alarms WHERE id = :alarmId")
     fun deleteById(alarmId: Int)
 
+    @Query("UPDATE my_alarms SET active = :activeState WHERE id = :alarmId")
+    fun updateActiveState(activeState: Boolean, alarmId: Int)
 }

@@ -9,8 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmModel
@@ -18,8 +16,7 @@ import java.lang.StringBuilder
 import android.content.Context.MODE_PRIVATE
 
 import android.content.SharedPreferences
-import android.widget.AdapterView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.LiveData
@@ -32,17 +29,11 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import java.lang.ref.WeakReference
 
 
-class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
+class ListAdapter(private val clickListener: (id: Int) -> Unit, private val switchListener: (id: Int, active: Boolean) -> Unit ): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     private var alarmList = mutableListOf<BuildNewAlarmModel>()
-    private lateinit var day:String
-    @InternalCoroutinesApi
-//    private lateinit var mAlarmModel: AlarmViewModel
-    private var mContext = context
 
-
-    class MyViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        val editor = itemView.context.getSharedPreferences("MyAlarm", Context.MODE_PRIVATE)
+    inner class MyViewHolder(itemView: View, private val clickListener: (id: Int) -> Unit, private val switchListener: (id: Int, active: Boolean) -> Unit ):RecyclerView.ViewHolder(itemView){
         private val view = WeakReference(itemView)
         private lateinit var id:TextView
         private lateinit var name:TextView
@@ -51,14 +42,12 @@ class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHold
         private lateinit var days:TextView
         private lateinit var mListener: AdapterView.OnItemClickListener;
         private lateinit var textviewDelete: TextView
+        private lateinit var switchButton: SwitchCompat
 
-        
-
-
-        var index = 0
         var onDeleteClick:((RecyclerView.ViewHolder) -> Unit )? = null
 
         init {
+            Log.d("ListAdapter", "Initialising fields")
             view.get()?.let {
                 it.setOnClickListener{
                     if (view.get()?.scrollX != 0){
@@ -72,35 +61,40 @@ class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHold
                 interval = it.findViewById(R.id.interval)
                 days = it.findViewById(R.id.days)
                 textviewDelete = it.findViewById(R.id.textview_delete)
+                switchButton = it.findViewById(R.id.my_switch)
 
                 textviewDelete.setOnClickListener {
 
                     onDeleteClick?.let { onDeleteClick ->
+                        Log.d("ListAdapter", "onDeleteClick this used")
                         onDeleteClick(this)
                     }
                 }
+
             }
         }
+
         fun updateView() {
             view.get()?.scrollTo(0, 0)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.custom_row, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder =
+        MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.custom_row2, parent, false),
+            clickListener,
+            switchListener
+        )
 
     @InternalCoroutinesApi
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem = alarmList[position]
 
-//        mAlarmModel = ViewModelProvider().get(AlarmViewModel::class.java)
         holder.updateView()
 
         holder.onDeleteClick = {
             removeItem(it)
-            removeFromDB(currentItem.id)
+            clickListener.invoke(currentItem.id)
         }
 
         holder.itemView.findViewById<TextView>(R.id.row_id_tv).text = currentItem.id.toString()
@@ -109,47 +103,24 @@ class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHold
         }else{
             holder.itemView.findViewById<TextView>(R.id.alarm_name).text = currentItem.alarmName
         }
-
         holder.itemView.findViewById<TextView>(R.id.time_range).text = currentItem.startTime+"-"+currentItem.endTime
         holder.itemView.findViewById<TextView>(R.id.interval).text = "Interval: "+currentItem.interval.toString()+" mins"
         holder.itemView.findViewById<TextView>(R.id.days).text = currentItem.daysSelected
 
         val switchButton = holder.itemView.findViewById<SwitchCompat>(R.id.my_switch)
-
-        val sharedPreferences = holder.itemView.context.getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        switchButton.isChecked = sharedPreferences.getBoolean("$currentItem.id", false)
-        Log.d("Alarm No.: ", currentItem.id.toString())
+        switchButton.isChecked = currentItem.active
 
         switchButton.setOnCheckedChangeListener{ _, isChecked ->
-            Log.d("Toggled Alarm no: ", currentItem.id.toString())
-            if(isChecked){
-                editor.putBoolean("$currentItem.id", true)
-            }else{
-                editor.putBoolean("$currentItem.id", false)
-            }
-            editor.commit()
+            switchListener.invoke(currentItem.id, isChecked)
         }
-    }
 
-    @InternalCoroutinesApi
-    private fun removeFromDB(id: Int) {
-        (mContext as MainActivity).deleteAlarm(id)
     }
 
     private fun removeItem(it: RecyclerView.ViewHolder) {
-
         val position = it.adapterPosition
-        //remove data
-        alarmList.removeAt(position)
-
-        //remove item
-        notifyItemRemoved(position)
+        alarmList.removeAt(position) //remove data
+        notifyItemRemoved(position) //remove item
     }
-
-//    interface OnItemClickListener {
-//        public void onItemClickListener(view: View, position: Int);
-//    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setData(alarm: List<BuildNewAlarmModel>){
@@ -161,12 +132,5 @@ class ListAdapter(context: Context): RecyclerView.Adapter<ListAdapter.MyViewHold
     override fun getItemCount(): Int {
         return alarmList.size
     }
-
-//    fun reload(list: List<BuildNewAlarmModel>) {
-//        this.alarmList.clear()
-//        this.alarmList.addAll(list)
-//        notifyDataSetChanged()
-//    }
-
 
 }

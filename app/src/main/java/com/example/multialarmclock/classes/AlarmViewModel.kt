@@ -2,6 +2,7 @@ package com.example.multialarmclock.classes
 
 import android.app.Application
 import android.database.Cursor
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,14 @@ class AlarmViewModel(application: Application): AndroidViewModel(application) {
     fun deleteAlarm(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAlarm(id)
+            Log.d("AlarmViewModel", "Deleting alarm")
+        }
+    }
+
+    fun updateActiveState(activeState: Boolean, id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateActiveState(activeState, id)
+            Log.d("AlarmViewModel", "Updating State of alarm: $id to $activeState")
         }
     }
 

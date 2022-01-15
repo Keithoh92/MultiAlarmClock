@@ -21,12 +21,9 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.multialarmclock.classes.AlarmViewModel
-import com.example.multialarmclock.classes.DisplayModel
 import com.example.multialarmclock.classes.TimeViewModel
 import com.example.multialarmclock.classes.TimeViewModelFactory
 import com.example.multialarmclock.data.BuildNewAlarmModel
@@ -34,14 +31,8 @@ import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
-import nl.joery.timerangepicker.TimeRangePicker
-import nl.joery.timerangepicker.TimeRangePicker.Thumb.START
-import java.lang.reflect.Array.get
-import java.sql.Time
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.time.hours
 
 class BuildNewAlarm : AppCompatActivity() {
 
@@ -101,7 +92,6 @@ class BuildNewAlarm : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_build_new_alarm)
-        val factory = TimeViewModelFactory()
         mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         myTimeDisplayViewmodel = ViewModelProvider(this).get(TimeViewModel::class.java)
         binding.timeViewModel = myTimeDisplayViewmodel
@@ -113,7 +103,6 @@ class BuildNewAlarm : AppCompatActivity() {
         binding.shapeCorner
         alarmName = findViewById(R.id.edit_name)
         binding.radioGroup
-        val myRadioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         toggleOn = findViewById<RadioButton>(R.id.toggle_on)
         toggleOff = findViewById<RadioButton>(R.id.toggle_off)
 
@@ -256,12 +245,7 @@ class BuildNewAlarm : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-        var numOfAlarms = 0
-        val sharedPreference:SharedPreferences = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
         mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-        mAlarmViewModel.readLastEntered.observe(this, {alarm->
-            numOfAlarms = alarm.get(0).id
-        })
 
         val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
         //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
@@ -273,14 +257,10 @@ class BuildNewAlarm : AppCompatActivity() {
         val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
         val interval = intervalPicker.value
         val time = cal.time.toString()
-        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time)
+        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time, true)
         mAlarmViewModel.addAlarm(alarm)
         Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
-        val id = numOfAlarms+1
-        Log.d("New Alarm no saved at: ", id.toString())
-        var editor = sharedPreference.edit()
-        editor.putBoolean(id.toString(),true)
-        editor.commit()
+
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
@@ -291,12 +271,10 @@ class BuildNewAlarm : AppCompatActivity() {
         startTimePicker = findViewById(R.id.picker1)
         endTimePicker = findViewById(R.id.picker2)
 
-
         startTimePicker.hour = 8
         startTimePicker.minute = 0
         endTimePicker.hour = 9
         endTimePicker.minute = 0
-
 
         startTimeTv = findViewById(R.id.start_time_tv)
         endTimeTV = findViewById(R.id.end_time_tv)

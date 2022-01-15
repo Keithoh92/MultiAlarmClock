@@ -1,77 +1,59 @@
 package com.example.multialarmclock
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteException
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.drawable.AnimatedVectorDrawable
-import android.graphics.drawable.ShapeDrawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.RoomOpenHelper
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.example.multialarmclock.classes.AlarmViewModel
-import com.example.multialarmclock.data.AlarmDao
-import com.example.multialarmclock.data.AlarmDatabase
-import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlin.properties.Delegates
-import android.widget.ListAdapter as ListAdapter
-
+import com.example.multialarmclock.list.ListAdapter
 
 class MainActivity : AppCompatActivity() {
-
 
     private lateinit var binding: ActivityMainBinding
     @InternalCoroutinesApi
     private lateinit var mAlarmModel: AlarmViewModel
     var toolbar: Toolbar? = null
-    val adapter = com.example.multialarmclock.list.ListAdapter(this)
+    @InternalCoroutinesApi
+    val adapter = ListAdapter (
+        { id ->
+            mAlarmModel.deleteAlarm(id)
+        },
+        { id, active ->
+            mAlarmModel.updateActiveState(active, id)
+        }
+    )
 
     //Setup for last used cardview
     private lateinit var daysChosen:TextView
+    private lateinit var onOffSignal:TextView
     private lateinit var range:TextView
     private lateinit var interval:TextView
     private lateinit var setButton:Button
     private lateinit var editButton:Button
     private lateinit var switchButton:SwitchCompat
 
-    private val swipeRefreshLayout:SwipeRefreshLayout by lazy {
-        findViewById(R.id.swipe_refresh_layout)
-    }
-
     private val recyclerView:RecyclerView by lazy {
         findViewById(R.id.recyclerview)
     }
-
-    private lateinit var cursor:Cursor
-    private lateinit var dividerItemDecoration: DividerItemDecoration
 
     internal lateinit var cvBottomRight:CardView
 
@@ -95,11 +77,6 @@ class MainActivity : AppCompatActivity() {
             applicationContext, LinearLayoutManager.VERTICAL
         ))
 
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = false
-            reloadAdapter()
-        }
-
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         reloadAdapter()
 
@@ -107,16 +84,25 @@ class MainActivity : AppCompatActivity() {
 
         //1st card view - set last created alarm details to view
         mAlarmModel.readLastEntered.observe(this, Observer { alarm->
-            daysChosen.text = alarm.get(0).daysSelected
-            val st = alarm.get(0).startTime
-            val et = alarm.get(0).endTime
-            range.text = "Range: $st-$et"
-            if(alarm.get(0).interval == 60){
-                interval.text = "Set Every hour"
-            }else{
-                interval.text = "Set Every "+alarm.get(0).interval+" mins"
+            if(!alarm.isEmpty()) {
+                daysChosen.text = alarm.get(0).daysSelected
+                onOffSignal.text = if (alarm.get(0).active) ":ON" else ":OFF"
+                val st = alarm.get(0).startTime
+                val et = alarm.get(0).endTime
+                range.text = "Range: $st-$et"
+                if (alarm.get(0).interval == 60) {
+                    interval.text = "Set Every hour"
+                } else {
+                    interval.text = "Set Every " + alarm.get(0).interval + " mins"
+                }
+                Log.d("MainAct", alarm.get(0).daysSelected)
+            }else {
+                daysChosen.text = "No Alarms Set"
+                val st = "N/A"
+                val et = "N/A"
+                range.text = "Range: N/a"
+                interval.text = "N/A"
             }
-            Log.d("MainAct", alarm.get(0).daysSelected)
         })
 
         intitialiseFields();
@@ -195,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                         viewHolder.itemView.scrollTo(scrollOffset, 0)
                     }
                     else {
-                        // sqipe with auto animation
+                        // swipe with auto animation
                         if (firstInActive) {
                             firstInActive = false
                             currentScrollXWhenInActive = viewHolder.itemView.scrollX
@@ -224,8 +210,6 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-
-
         }).apply {
             attachToRecyclerView(recyclerView)
         }
@@ -236,18 +220,6 @@ class MainActivity : AppCompatActivity() {
         return (dpValue * context.resources.displayMetrics.density).toInt()
     }
 
-    @InternalCoroutinesApi
-    fun deleteAlarm(id: Int) {
-        mAlarmModel.deleteAlarm(id)
-    }
-
-    @InternalCoroutinesApi
-    override fun onResume() {
-        super.onResume()
-        reloadAdapter()
-        val editor = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
-    }
-
     private fun openAlarmBuilder() {
         val startAlarmBuilderActivity = Intent(this, BuildNewAlarm::class.java)
         startActivity(startAlarmBuilderActivity)
@@ -256,6 +228,7 @@ class MainActivity : AppCompatActivity() {
     //fill list with DB alarm data
     @InternalCoroutinesApi
     private fun reloadAdapter(){
+        Log.d("MainAct", "Calling Reload Adapter")
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         mAlarmModel.readAllData.observe(this, Observer { alarm->
             adapter.setData(alarm)
@@ -269,6 +242,7 @@ class MainActivity : AppCompatActivity() {
         cvBottomRight = findViewById(R.id.cardview_bottom_right)
 
         daysChosen = findViewById<TextView>(R.id.days_chosen)
+        onOffSignal = findViewById<TextView>(R.id.on_off_signal)
         range = findViewById<TextView>(R.id.range)
         interval = findViewById<TextView>(R.id.go_off_times)
         editButton = findViewById(R.id.edit_button)
@@ -295,7 +269,4 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-//    fun setItemTouchListener(){
-//
-//    }
 }
