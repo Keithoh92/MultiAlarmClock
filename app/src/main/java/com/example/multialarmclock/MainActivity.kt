@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -34,28 +33,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mAlarmModel: AlarmViewModel
     var toolbar: Toolbar? = null
     @InternalCoroutinesApi
-    val adapter = ListAdapter { id ->
-        mAlarmModel.deleteAlarm(id)
-    }
+    val adapter = ListAdapter (
+        { id ->
+            mAlarmModel.deleteAlarm(id)
+        },
+        { id, active ->
+            mAlarmModel.updateActiveState(active, id)
+        }
+    )
 
     //Setup for last used cardview
     private lateinit var daysChosen:TextView
+    private lateinit var onOffSignal:TextView
     private lateinit var range:TextView
     private lateinit var interval:TextView
     private lateinit var setButton:Button
     private lateinit var editButton:Button
     private lateinit var switchButton:SwitchCompat
 
-    private val swipeRefreshLayout:SwipeRefreshLayout by lazy {
-        findViewById(R.id.swipe_refresh_layout)
-    }
-
     private val recyclerView:RecyclerView by lazy {
         findViewById(R.id.recyclerview)
     }
-
-    private lateinit var cursor:Cursor
-    private lateinit var dividerItemDecoration: DividerItemDecoration
 
     internal lateinit var cvBottomRight:CardView
 
@@ -79,11 +77,6 @@ class MainActivity : AppCompatActivity() {
             applicationContext, LinearLayoutManager.VERTICAL
         ))
 
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = false
-            reloadAdapter()
-        }
-
         mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         reloadAdapter()
 
@@ -91,16 +84,25 @@ class MainActivity : AppCompatActivity() {
 
         //1st card view - set last created alarm details to view
         mAlarmModel.readLastEntered.observe(this, Observer { alarm->
-            daysChosen.text = alarm.get(0).daysSelected
-            val st = alarm.get(0).startTime
-            val et = alarm.get(0).endTime
-            range.text = "Range: $st-$et"
-            if(alarm.get(0).interval == 60){
-                interval.text = "Set Every hour"
-            }else{
-                interval.text = "Set Every "+alarm.get(0).interval+" mins"
+            if(!alarm.isEmpty()) {
+                daysChosen.text = alarm.get(0).daysSelected
+                onOffSignal.text = if (alarm.get(0).active) ":ON" else ":OFF"
+                val st = alarm.get(0).startTime
+                val et = alarm.get(0).endTime
+                range.text = "Range: $st-$et"
+                if (alarm.get(0).interval == 60) {
+                    interval.text = "Set Every hour"
+                } else {
+                    interval.text = "Set Every " + alarm.get(0).interval + " mins"
+                }
+                Log.d("MainAct", alarm.get(0).daysSelected)
+            }else {
+                daysChosen.text = "No Alarms Set"
+                val st = "N/A"
+                val et = "N/A"
+                range.text = "Range: N/a"
+                interval.text = "N/A"
             }
-            Log.d("MainAct", alarm.get(0).daysSelected)
         })
 
         intitialiseFields();
@@ -179,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                         viewHolder.itemView.scrollTo(scrollOffset, 0)
                     }
                     else {
-                        // sqipe with auto animation
+                        // swipe with auto animation
                         if (firstInActive) {
                             firstInActive = false
                             currentScrollXWhenInActive = viewHolder.itemView.scrollX
@@ -208,8 +210,6 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-
-
         }).apply {
             attachToRecyclerView(recyclerView)
         }
@@ -219,18 +219,6 @@ class MainActivity : AppCompatActivity() {
     private fun dpToPx(dpValue: Float, context: Context): Int {
         return (dpValue * context.resources.displayMetrics.density).toInt()
     }
-
-    @InternalCoroutinesApi
-    fun deleteAlarm(id: Int) {
-        mAlarmModel.deleteAlarm(id)
-    }
-
-//    @InternalCoroutinesApi
-//    override fun onResume() {
-//        super.onResume()
-//        reloadAdapter()
-//        val editor = getSharedPreferences("MyAlarms", Context.MODE_PRIVATE)
-//    }
 
     private fun openAlarmBuilder() {
         val startAlarmBuilderActivity = Intent(this, BuildNewAlarm::class.java)
@@ -254,6 +242,7 @@ class MainActivity : AppCompatActivity() {
         cvBottomRight = findViewById(R.id.cardview_bottom_right)
 
         daysChosen = findViewById<TextView>(R.id.days_chosen)
+        onOffSignal = findViewById<TextView>(R.id.on_off_signal)
         range = findViewById<TextView>(R.id.range)
         interval = findViewById<TextView>(R.id.go_off_times)
         editButton = findViewById(R.id.edit_button)
@@ -280,7 +269,4 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-//    fun setItemTouchListener(){
-//
-//    }
 }

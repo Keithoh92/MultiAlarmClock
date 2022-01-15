@@ -1,6 +1,5 @@
 package com.example.multialarmclock.data
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 
 class AlarmRepository(private val alarmDao: AlarmDao) {
@@ -12,8 +11,12 @@ class AlarmRepository(private val alarmDao: AlarmDao) {
         alarmDao.addAlarm(buildNewAlarmModel)
     }
 
-    suspend fun deleteAlarm(id: Int) {
+    fun deleteAlarm(id: Int) {
         alarmDao.deleteById(id)
+    }
+
+    fun updateActiveState(active: Boolean, id: Int) {
+        alarmDao.updateActiveState(active, id)
     }
 
 }

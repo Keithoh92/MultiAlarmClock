@@ -1,6 +1,7 @@
 package com.example.multialarmclock.data
 
 import android.net.Uri
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.sql.Time
@@ -18,6 +19,6 @@ data class BuildNewAlarmModel(
     val endTime:String,
     val sound: String,
     val interval:Int,
-    val time: String
-
+    val time: String,
+    @ColumnInfo(defaultValue = "0") val active: Boolean
 )

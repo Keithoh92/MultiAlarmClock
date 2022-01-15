@@ -50,23 +50,44 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/cardview_shape">
 
-                <TextView
-                    android:id="@+id/cardview_top_left_tv"
+                <RelativeLayout
+                    android:id="@+id/cardview_top_left_title"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
+
+                    >
+                <TextView
+                    android:id="@+id/cardview_top_left_tv"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center_horizontal"
                     android:text="Last used"
                     android:textColor="@color/white"
-                    android:textSize="20dp">
+                    android:textSize="20dp"
+                    android:layout_centerInParent="true">
 
                 </TextView>
+
+                    <TextView
+                        android:id="@+id/on_off_signal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text=":ON"
+                        android:textColor="#10b018"
+                        android:textSize="15dp"
+                        android:gravity="center_vertical"
+                        android:layout_toRightOf="@id/cardview_top_left_tv"
+                        >
+
+                    </TextView>
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/days_chosen"
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
-                    android:layout_below="@id/cardview_top_left_tv"
+                    android:layout_below="@id/cardview_top_left_title"
                     android:layout_marginLeft="10dp"
                     android:text="M T W T F"
                     android:textColor="@color/white"
@@ -290,11 +311,6 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/recyclerviewbg">
 
-                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                    android:id="@+id/swipe_refresh_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview"
                     android:layout_width="match_parent"
@@ -302,7 +318,6 @@
                     android:scrollbars="vertical"
                     android:scrollbarAlwaysDrawVerticalTrack="true"
                     />
-                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             </RelativeLayout>
 
