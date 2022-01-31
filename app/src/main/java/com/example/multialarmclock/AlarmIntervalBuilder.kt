@@ -1,14 +1,7 @@
 package com.example.multialarmclock
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
-import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -16,90 +9,91 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.classes.TimeViewModel
-import com.example.multialarmclock.classes.TimeViewModelFactory
 import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
-
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 import kotlin.collections.ArrayList
 
-class BuildNewAlarm : AppCompatActivity() {
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [AlarmIntervalBuilder.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class AlarmIntervalBuilder : Fragment() {
+    // TODO: Rename and change types of parameters
+    private var param1: String? = null
+    private var param2: String? = null
     private lateinit var binding: ActivityBuildNewAlarmBinding
     @RequiresApi(Build.VERSION_CODES.P)
-    internal lateinit var slider:FluidSlider
+    internal lateinit var slider: FluidSlider
 
     @InternalCoroutinesApi
-    private lateinit var mAlarmViewModel:AlarmViewModel
-    internal lateinit var myTimeDisplayViewmodel:TimeViewModel
+    private lateinit var mAlarmViewModel: AlarmViewModel
+    internal lateinit var myTimeDisplayViewmodel: TimeViewModel
 
     val cal = Calendar.getInstance()
 
-    internal lateinit var alarmName:EditText
+    internal lateinit var alarmName: EditText
 
-    internal lateinit var toggleOn:RadioButton
-    internal lateinit var toggleOff:RadioButton
+    internal lateinit var toggleOn: RadioButton
+    internal lateinit var toggleOff: RadioButton
 
     internal lateinit var daysSelected:ArrayList<String>
-    internal lateinit var cbDay1:CheckBox
-    internal lateinit var cbDay2:CheckBox
-    internal lateinit var cbDay3:CheckBox
-    internal lateinit var cbDay4:CheckBox
-    internal lateinit var cbDay5:CheckBox
-    internal lateinit var cbDay6:CheckBox
-    internal lateinit var cbDay7:CheckBox
+    internal lateinit var cbDay1: CheckBox
+    internal lateinit var cbDay2: CheckBox
+    internal lateinit var cbDay3: CheckBox
+    internal lateinit var cbDay4: CheckBox
+    internal lateinit var cbDay5: CheckBox
+    internal lateinit var cbDay6: CheckBox
+    internal lateinit var cbDay7: CheckBox
 
-    internal lateinit var startTimePicker:TimePicker
-    internal lateinit var endTimePicker:TimePicker
-    internal lateinit var timeRangeCV:CardView
+    internal lateinit var startTimePicker: TimePicker
+    internal lateinit var endTimePicker: TimePicker
+    internal lateinit var timeRangeCV: CardView
 
-    internal lateinit var startTimeTv:TextView
-    internal lateinit var endTimeTV:TextView
+    internal lateinit var startTimeTv: TextView
+    internal lateinit var endTimeTV: TextView
     internal var startTimeTemp:String? = null
     internal var endTimeTemp:String? = null
 
-    internal lateinit var rt_tv:TextView
-    internal lateinit var ringtoneDefault:Ringtone
-    internal var chosenRingtone:Ringtone? = null
-    internal lateinit var currentRingtone:Uri
-    var chosenRTUri:Uri?=null
-    internal lateinit var intervalPicker:NumberPicker
-
-    var dbInsertionSuccessful:Long = 0
-
-    internal var min: Double = 00.00
-    internal var max: Double = 00.00
+    internal lateinit var rt_tv: TextView
+    internal lateinit var ringtoneDefault: Ringtone
+    internal var chosenRingtone: Ringtone? = null
+    internal lateinit var currentRingtone: Uri
+    var chosenRTUri: Uri?=null
+    internal lateinit var intervalPicker: NumberPicker
 
     @InternalCoroutinesApi
-    @RequiresApi(Build.VERSION_CODES.Q)
-    @SuppressLint("LongLogTag", "RestrictedApi", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_build_new_alarm)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
         mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-        myTimeDisplayViewmodel = ViewModelProvider(this).get(TimeViewModel::class.java)
-        binding.timeViewModel = myTimeDisplayViewmodel
-        binding.lifecycleOwner = this
 
 
-        //VIEWS INITIALISATION
-        setSupportActionBar(binding.mytoolbarBuildAlarm)
         binding.shapeCorner
-        alarmName = findViewById(R.id.edit_name)
         binding.radioGroup
-        toggleOn = findViewById<RadioButton>(R.id.toggle_on)
-        toggleOff = findViewById<RadioButton>(R.id.toggle_off)
 
         toggleOff.isChecked = true
         if(toggleOff.isChecked){
@@ -109,83 +103,64 @@ class BuildNewAlarm : AppCompatActivity() {
             toggleOff.isChecked = false
         }
 
-        onClickTime()
 
 
-        ///////////////////////// ALARM DAY CHOICES /////////////////////////////////////
-        cbDay1 = findViewById(R.id.cb_day1)
-        cbDay2 = findViewById(R.id.cb_day2)
-        cbDay3 = findViewById(R.id.cb_day3)
-        cbDay4 = findViewById(R.id.cb_day4)
-        cbDay5 = findViewById(R.id.cb_day5)
-        cbDay6 = findViewById(R.id.cb_day6)
-        cbDay7 = findViewById(R.id.cb_day7)
 
 
-        timeRangeCV = findViewById(R.id.time_range_picker)
 
 
-//        picker.startTime = TimeRangePicker.Time(12,0)
-//        picker.endTime = TimeRangePicker.Time(7,0)
-//        startTimeTv.text = picker.startTime.toString()
-//        endTimeTV.text = picker.endTime.toString()
+    }
 
-//        picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
-//            override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
-//                // Do something on start dragging
-//                if(thumb == TimeRangePicker.Thumb.START){
-//                    startTimeTv.textSize = 20.0f
-//                }
-//                if(thumb == TimeRangePicker.Thumb.END){
-//                    endTimeTV.textSize = 20.0f
-//                }
-//                return true // Return false to disallow the user from dragging a handle.
-//            }
-//
-//            override fun onDragStop(thumb: TimeRangePicker.Thumb) {
-//                startTimeTv.textSize = 15.0f
-//                endTimeTV.textSize = 15.0f
-//            }
-//        })
-//
-//        picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
-//            override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
-//                Log.d("TimeRangePicker", "Duration: " + duration)
-//            }
-//
-//            override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
-//                endTimeTV.text = "End Time: ${endTime}"
-//            }
-//
-//            override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
-//                Log.d("TimeRangePicker", "Start time: " + startTime)
-//                startTimeTv.text = "Start Time: ${startTime}"
-//            }
-//        })
+    @InternalCoroutinesApi
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        val root =  inflater.inflate(R.layout.fragment_alarm_interval_builder, container, false)
 
-        //////////////////////////////// END OF ALARM TIME LOGIC  //////////////////////////////////////////////////
+        ////////////////////////Initialise Views///////////////////////////////////
+        alarmName = root.findViewById(R.id.edit_name) //Alarm Name TextView
+        //Alarm Weekly switch button
+        toggleOn = root.findViewById<RadioButton>(R.id.toggle_on)
+        toggleOff = root.findViewById<RadioButton>(R.id.toggle_off)
 
-        /////////////////////////////// INTERVAL TIME PICKER //////////////////////////////////////////////
-        intervalPicker = findViewById(R.id.interval_picker)
+        //ALARM DAY CHOICES
+        cbDay1 = root.findViewById(R.id.cb_day1)
+        cbDay2 = root.findViewById(R.id.cb_day2)
+        cbDay3 = root.findViewById(R.id.cb_day3)
+        cbDay4 = root.findViewById(R.id.cb_day4)
+        cbDay5 = root.findViewById(R.id.cb_day5)
+        cbDay6 = root.findViewById(R.id.cb_day6)
+        cbDay7 = root.findViewById(R.id.cb_day7)
+        timeRangeCV = root.findViewById(R.id.time_range_picker) //cardview for start &  end time pickers
+        //Alarm to go off every X minutes
+        intervalPicker = root.findViewById(R.id.interval_picker)
         intervalPicker.minValue = 0
         intervalPicker.maxValue = 60
         intervalPicker.setFormatter {
             String.format("%02d", it)
         }
+
+
+
+        onClickTime(root)
+        ringtoneManager()
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM)
+        currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(activity, RingtoneManager.TYPE_ALARM)
 
-        val ringtoneDefault = RingtoneManager.getRingtone(this, currentRingtone)
-        val rt1 = ringtoneDefault.getTitle(this)
+        val ringtoneDefault = RingtoneManager.getRingtone(activity, currentRingtone)
+        val rt1 = ringtoneDefault.getTitle(activity)
         Log.d("RT", rt1.toString())
 
-        rt_tv = findViewById(R.id.ringtone_tv)
+        rt_tv = root.findViewById(R.id.ringtone_tv)
         rt_tv.text = "Current:\n"+rt1.toString()
 
-       val playButton = findViewById<ImageButton>(R.id.play_button)
-       val stopButton = findViewById<ImageButton>(R.id.stop_button)
-       val chooseRingtone = findViewById<ImageButton>(R.id.choose_ringtone)
+        val playButton = root.findViewById<ImageButton>(R.id.play_button)
+        val stopButton = root.findViewById<ImageButton>(R.id.stop_button)
+        val chooseRingtone = root.findViewById<ImageButton>(R.id.choose_ringtone)
 
         playButton.setOnClickListener{
             if(chosenRingtone == null){
@@ -210,8 +185,8 @@ class BuildNewAlarm : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 if(it.resultCode == Activity.RESULT_OK){
                     chosenRTUri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                    val chosenRingtone = RingtoneManager.getRingtone(this, chosenRTUri)
-                    val rt1 = chosenRingtone.getTitle(this)
+                    val chosenRingtone = RingtoneManager.getRingtone(activity, chosenRTUri)
+                    val rt1 = chosenRingtone.getTitle(activity)
                     rt_tv.text = "Current:\n"+rt1.toString()
                 }
             }
@@ -226,16 +201,41 @@ class BuildNewAlarm : AppCompatActivity() {
             getResult.launch(intent)
         }
 
-        val saveButton = findViewById(R.id.save_button) as Button
+        val saveButton = root.findViewById(R.id.save_button) as Button
         saveButton.setOnClickListener{
             if( startTimeTemp != null && endTimeTemp != null) {
                 insertNewAlarmToDB()
             } else {
-                Toast.makeText(this, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
             }
         }
 
-    }////////////////////// END OF ON CREATE ///////////////////////////
+        return root
+    }
+
+    private fun ringtoneManager() {
+        TODO("Not yet implemented")
+    }
+
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment AlarmIntervalBuilder.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            AlarmIntervalBuilder().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
@@ -254,7 +254,7 @@ class BuildNewAlarm : AppCompatActivity() {
         val time = cal.time.toString()
         val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time, true)
         mAlarmViewModel.addAlarm(alarm)
-        Toast.makeText(applicationContext, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
 
     }
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
@@ -262,17 +262,17 @@ class BuildNewAlarm : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun onClickTime() {
-        startTimePicker = findViewById(R.id.picker1)
-        endTimePicker = findViewById(R.id.picker2)
+    private fun onClickTime(root: View) {
+        startTimePicker = root.findViewById(R.id.picker1)
+        endTimePicker = root.findViewById(R.id.picker2)
 
         startTimePicker.hour = 8
         startTimePicker.minute = 0
         endTimePicker.hour = 9
         endTimePicker.minute = 0
 
-        startTimeTv = findViewById(R.id.start_time_tv)
-        endTimeTV = findViewById(R.id.end_time_tv)
+        startTimeTv = root.findViewById(R.id.start_time_tv)
+        endTimeTV = root.findViewById(R.id.end_time_tv)
 
         startTimeTv.text = "Start Time: 8:00 AM"
         endTimeTV.text = "End Time: 9:00 AM"
@@ -364,4 +364,5 @@ class BuildNewAlarm : AppCompatActivity() {
 
         return "$h:$m"
     }
+
 }
