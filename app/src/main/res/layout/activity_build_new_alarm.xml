@@ -164,7 +164,7 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:context=".BuildNewAlarm"
+                tools:context=".feature.alarmIntervalBuilder.BuildNewAlarm"
                 android:background="#000">
 
             <RelativeLayout

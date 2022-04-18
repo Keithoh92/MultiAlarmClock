@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id("dagger.hilt.android.plugin")
 }
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -44,6 +45,10 @@ dependencies {
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation("androidx.room:room-runtime:$room_version")
+
+    // Dependency Injection
+    implementation("com.google.dagger:hilt-android:2.38.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.38.1")
 
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:2.3.0")
