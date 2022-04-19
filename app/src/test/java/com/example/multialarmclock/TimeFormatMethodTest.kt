@@ -1,14 +1,12 @@
 package com.example.multialarmclock
 
-import com.google.common.truth.ExpectFailure.assertThat
+import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildNewAlarm
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.*
 import com.google.common.truth.Truth
-import com.google.common.truth.Truth.assertThat
-import com.google.common.truth.TruthJUnit
 
 
 @RunWith(JUnit4::class)

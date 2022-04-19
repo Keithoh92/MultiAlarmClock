@@ -1,10 +1,6 @@
 package com.example.multialarmclock.list
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Application
-import android.content.Context
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,19 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmModel
-import java.lang.StringBuilder
-import android.content.Context.MODE_PRIVATE
 
-import android.content.SharedPreferences
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import com.example.multialarmclock.MainActivity
-import com.example.multialarmclock.classes.AlarmViewModel
-import com.example.multialarmclock.prefs
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.lang.ref.WeakReference
 
@@ -40,7 +26,7 @@ class ListAdapter(private val clickListener: (id: Int) -> Unit, private val swit
         private lateinit var timeRange:TextView
         private lateinit var interval:TextView
         private lateinit var days:TextView
-        private lateinit var mListener: AdapterView.OnItemClickListener;
+        private lateinit var mListener: AdapterView.OnItemClickListener
         private lateinit var textviewDelete: TextView
         private lateinit var switchButton: SwitchCompat
 
@@ -85,7 +71,6 @@ class ListAdapter(private val clickListener: (id: Int) -> Unit, private val swit
             switchListener
         )
 
-    @InternalCoroutinesApi
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem = alarmList[position]
@@ -99,12 +84,12 @@ class ListAdapter(private val clickListener: (id: Int) -> Unit, private val swit
 
         holder.itemView.findViewById<TextView>(R.id.row_id_tv).text = currentItem.id.toString()
         if(currentItem.alarmName == ""){
-            holder.itemView.findViewById<TextView>(R.id.alarm_name).text = "Alarm "+currentItem.id.toString()
+            holder.itemView.findViewById<TextView>(R.id.alarm_name).text = "Alarm ${currentItem.id}"
         }else{
             holder.itemView.findViewById<TextView>(R.id.alarm_name).text = currentItem.alarmName
         }
-        holder.itemView.findViewById<TextView>(R.id.time_range).text = currentItem.startTime+"-"+currentItem.endTime
-        holder.itemView.findViewById<TextView>(R.id.interval).text = "Interval: "+currentItem.interval.toString()+" mins"
+        holder.itemView.findViewById<TextView>(R.id.time_range).text = "${currentItem.startTime}-${currentItem.endTime}"
+        holder.itemView.findViewById<TextView>(R.id.interval).text = "Interval: ${currentItem.interval} mins"
         holder.itemView.findViewById<TextView>(R.id.days).text = currentItem.daysSelected
 
         val switchButton = holder.itemView.findViewById<SwitchCompat>(R.id.my_switch)

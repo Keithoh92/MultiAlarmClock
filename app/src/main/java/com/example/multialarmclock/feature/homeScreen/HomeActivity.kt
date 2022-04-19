@@ -1,8 +1,7 @@
-package com.example.multialarmclock
+package com.example.multialarmclock.feature.homeScreen
 
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
@@ -10,6 +9,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
@@ -21,18 +21,28 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildNewAlarm
+import com.example.multialarmclock.R
 import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import kotlinx.coroutines.InternalCoroutinesApi
 import com.example.multialarmclock.list.ListAdapter
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     @InternalCoroutinesApi
     private lateinit var mAlarmModel: AlarmViewModel
+
+    private val viewModel: HomeScreenViewModel by viewModels()
+
     var toolbar: Toolbar? = null
     @InternalCoroutinesApi
+
     val adapter = ListAdapter (
         { id ->
             mAlarmModel.deleteAlarm(id)
@@ -59,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     private var menu: Menu? = null
 
-    @InternalCoroutinesApi
+    @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
 
             // the limit of swipe same as delete button in item 100dp
-            private val limitScrollX = dpToPx(100f, this@MainActivity)
+            private val limitScrollX = dpToPx(100f, this@HomeActivity)
             private var currentScrollX= 0
             private var currentScrollXWhenInActive = 0
             private var initXWhenInActive = 0f

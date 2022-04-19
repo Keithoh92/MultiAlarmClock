@@ -1,14 +1,9 @@
-package com.example.multialarmclock
+package com.example.multialarmclock.feature.alarmIntervalBuilder
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
-import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -23,9 +18,9 @@ import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.example.multialarmclock.R
 import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.classes.TimeViewModel
-import com.example.multialarmclock.classes.TimeViewModelFactory
 import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 
@@ -81,12 +76,12 @@ class BuildNewAlarm : AppCompatActivity() {
     internal var min: Double = 00.00
     internal var max: Double = 00.00
 
-    @InternalCoroutinesApi
+    @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("LongLogTag", "RestrictedApi", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_build_new_alarm)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_build_new_alarm)
         mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
         myTimeDisplayViewmodel = ViewModelProvider(this).get(TimeViewModel::class.java)
         binding.timeViewModel = myTimeDisplayViewmodel
