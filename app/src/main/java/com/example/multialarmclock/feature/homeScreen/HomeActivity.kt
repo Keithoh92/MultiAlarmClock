@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -16,58 +15,52 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildNewAlarm
 import com.example.multialarmclock.R
-import com.example.multialarmclock.classes.AlarmViewModel
+import com.example.multialarmclock.data.BuildNewAlarmModel
 import com.example.multialarmclock.databinding.ActivityMainBinding
+import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmActivity
 import kotlinx.coroutines.InternalCoroutinesApi
 import com.example.multialarmclock.list.ListAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    @InternalCoroutinesApi
-    private lateinit var mAlarmModel: AlarmViewModel
 
     private val viewModel: HomeScreenViewModel by viewModels()
 
-    var toolbar: Toolbar? = null
-    @InternalCoroutinesApi
+    //Setup for last used cardview
+    private lateinit var daysChosen: TextView
+    private lateinit var onOffSignal: TextView
+    private lateinit var range: TextView
+    private lateinit var interval: TextView
+    private lateinit var setButton: Button
+    private lateinit var editButton: Button
+    private lateinit var switchButton: SwitchCompat
 
-    val adapter = ListAdapter (
+    private lateinit var cvBottomRight:CardView
+
+    private var menu: Menu? = null
+
+    private var toolbar: Toolbar? = null
+
+    private val adapter = ListAdapter (
         { id ->
-            mAlarmModel.deleteAlarm(id)
+            viewModel.deleteAlarm(id)
         },
         { id, active ->
-            mAlarmModel.updateActiveState(active, id)
+            viewModel.updateActiveState(active, id)
         }
     )
-
-    //Setup for last used cardview
-    private lateinit var daysChosen:TextView
-    private lateinit var onOffSignal:TextView
-    private lateinit var range:TextView
-    private lateinit var interval:TextView
-    private lateinit var setButton:Button
-    private lateinit var editButton:Button
-    private lateinit var switchButton:SwitchCompat
 
     private val recyclerView:RecyclerView by lazy {
         findViewById(R.id.recyclerview)
     }
-
-    internal lateinit var cvBottomRight:CardView
-
-    private var menu: Menu? = null
 
     @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -76,53 +69,66 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_main)
 
-        binding.mytoolbar
+//        binding.mytoolbar
         setSupportActionBar(toolbar)
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        addSeparatorDecorationToRecyclerView()
 
-        //SeparatorDecoration
-        recyclerView.addItemDecoration(DividerItemDecoration(
-            applicationContext, LinearLayoutManager.VERTICAL
-        ))
-
-        mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-        reloadAdapter()
+        intitaliseViewModel()
+        setupObservers()
 
         setOnItemTouchHelper()
 
-        //1st card view - set last created alarm details to view
-        mAlarmModel.readLastEntered.observe(this, Observer { alarm->
-            if(!alarm.isEmpty()) {
-                daysChosen.text = alarm.get(0).daysSelected
-                onOffSignal.text = if (alarm.get(0).active) ":ON" else ":OFF"
-                val st = alarm.get(0).startTime
-                val et = alarm.get(0).endTime
-                range.text = "Range: $st-$et"
-                if (alarm.get(0).interval == 60) {
-                    interval.text = "Set Every hour"
-                } else {
-                    interval.text = "Set Every " + alarm.get(0).interval + " mins"
-                }
-                Log.d("MainAct", alarm.get(0).daysSelected)
-            }else {
-                daysChosen.text = "No Alarms Set"
-                val st = "N/A"
-                val et = "N/A"
-                range.text = "Range: N/a"
-                interval.text = "N/A"
-            }
+        intitialiseViews();
+
+        cvBottomRight.setOnClickListener { openAlarmBuilder() }
+
+    }
+
+    @OptIn(InternalCoroutinesApi::class)
+    private fun setupObservers() {
+        viewModel.readAllData.observe(this, Observer { alarm ->
+            adapter.setData(alarm)
         })
 
-        intitialiseFields();
-
-        cvBottomRight.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                openAlarmBuilder()
-            }
+        viewModel.readLastEntered.observe(this, Observer { alarm ->
+            populateFirstCardViewWithLastCreatedAlarm(alarm)
         })
+    }
 
+    private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmModel>) {
+        if(lastCreatedAlarm.isNotEmpty()) {
+            daysChosen.text = lastCreatedAlarm[0].daysSelected
+            onOffSignal.text = if (lastCreatedAlarm[0].active) ":ON" else ":OFF"
+            val st = lastCreatedAlarm[0].startTime
+            val et = lastCreatedAlarm[0].endTime
+            range.text = "Range: $st-$et"
+            if (lastCreatedAlarm.get(0).interval == 60) {
+                interval.text = "Set Every hour"
+            } else {
+                interval.text = "Set Every " + lastCreatedAlarm.get(0).interval + " mins"
+            }
+            Log.d("MainAct", lastCreatedAlarm.get(0).daysSelected)
+        }else {
+            daysChosen.text = "No Alarms Set"
+            val st = "N/A"
+            val et = "N/A"
+            range.text = "Range: N/a"
+            interval.text = "N/A"
+        }
+    }
+
+    private fun intitaliseViewModel() {
+        viewModel.getAllAlarms()
+        viewModel.getLastSavedAlarm()
+    }
+
+    private fun addSeparatorDecorationToRecyclerView() {
+        recyclerView.addItemDecoration(DividerItemDecoration(
+            applicationContext, LinearLayoutManager.VERTICAL
+        ))
     }
 
     private fun setOnItemTouchHelper() {
@@ -231,21 +237,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun openAlarmBuilder() {
-        val startAlarmBuilderActivity = Intent(this, BuildNewAlarm::class.java)
+        val startAlarmBuilderActivity = Intent(this, BuildIntervalAlarmActivity::class.java)
         startActivity(startAlarmBuilderActivity)
     }
 
-    //fill list with DB alarm data
-    @InternalCoroutinesApi
-    private fun reloadAdapter(){
-        Log.d("MainAct", "Calling Reload Adapter")
-        mAlarmModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-        mAlarmModel.readAllData.observe(this, Observer { alarm->
-            adapter.setData(alarm)
-        })
-    }
-
-    private fun intitialiseFields() {
+    private fun intitialiseViews() {
         val cardviewTopLeft = findViewById<CardView>(R.id.cardview_top_left)
         val cardviewTopRight = findViewById<CardView>(R.id.cardview_top_right)
         val cardviewBottomLeft = findViewById<CardView>(R.id.cardview_top_right)

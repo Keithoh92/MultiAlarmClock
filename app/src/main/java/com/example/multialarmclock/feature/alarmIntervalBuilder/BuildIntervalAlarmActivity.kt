@@ -11,7 +11,7 @@ class BuildIntervalAlarmActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(android.R.id.content, AlarmIntervalBuilder.newInstance())
+            .add(android.R.id.content, BuildIntervalAlarmFragment.newInstance())
             .commit()
     }
 }

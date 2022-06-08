@@ -1,7 +1,5 @@
 package com.example.multialarmclock.data
 
-import android.content.ClipData
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
@@ -15,10 +13,10 @@ interface AlarmDao {
     suspend fun addAlarm(buildNewAlarmModel: BuildNewAlarmModel)
 
     @Query("SELECT * FROM my_alarms ORDER BY id DESC")
-    fun readAllData(): LiveData<List<BuildNewAlarmModel>>
+    fun readAllData(): List<BuildNewAlarmModel>
 
     @Query("SELECT * FROM my_alarms ORDER BY id DESC limit 1")
-    fun readLastEntered(): LiveData<List<BuildNewAlarmModel>>
+    fun readLastEntered(): List<BuildNewAlarmModel>
 
     @Query("DELETE FROM my_alarms WHERE id = :alarmId")
     fun deleteById(alarmId: Int)

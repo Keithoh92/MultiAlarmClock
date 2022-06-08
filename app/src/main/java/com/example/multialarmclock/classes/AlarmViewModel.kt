@@ -1,50 +1,54 @@
 package com.example.multialarmclock.classes
 
 import android.app.Application
-import android.database.Cursor
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.multialarmclock.data.AlarmDatabase
 import com.example.multialarmclock.data.AlarmRepository
 import com.example.multialarmclock.data.BuildNewAlarmModel
+import com.example.multialarmclock.feature.base.liveData.SingleLiveEvent
+import com.example.multialarmclock.feature.base.viewModel.AlarmAppViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
-
 @InternalCoroutinesApi
-class AlarmViewModel(application: Application): AndroidViewModel(application) {
+class AlarmViewModel(
+    application: Application,
+    private val alarmRepository: AlarmRepository
+    ): AlarmAppViewModel() {
 
-    val readAllData:LiveData<List<BuildNewAlarmModel>>
+    private val _readAllData = SingleLiveEvent<List<BuildNewAlarmModel>>()
+    val readAllData = _readAllData as LiveData<List<BuildNewAlarmModel>>
 
-    val readLastEntered: LiveData<List<BuildNewAlarmModel>>
+    private val _readLastEntered = SingleLiveEvent<List<BuildNewAlarmModel>>()
+    val readLastEntered = _readLastEntered as LiveData<List<BuildNewAlarmModel>>
 
-    private val repository:AlarmRepository
-    init{
-        val alarmDao = AlarmDatabase.getDatabase(application).alarmDao()
-        repository = AlarmRepository(alarmDao)
-        readAllData = repository.readAllData
-        readLastEntered = repository.readLastEntered
+    fun getAllAlarms() = viewModelScope.launch {
+        _readAllData.postCall(alarmRepository.fetchAllAlarms())
+    }
+
+    fun getLastSavedAlarm() = viewModelScope.launch {
+        _readLastEntered.postCall(alarmRepository.getLastSavedAlarm())
     }
 
     fun addAlarm(buildAlarm:BuildNewAlarmModel){
         viewModelScope.launch(Dispatchers.IO){
-            repository.addAlarm(buildAlarm)
+            alarmRepository.addAlarm(buildAlarm)
         }
     }
 
     fun deleteAlarm(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteAlarm(id)
+            alarmRepository.deleteAlarm(id)
             Log.d("AlarmViewModel", "Deleting alarm")
         }
     }
 
     fun updateActiveState(activeState: Boolean, id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateActiveState(activeState, id)
+            alarmRepository.updateActiveState(activeState, id)
             Log.d("AlarmViewModel", "Updating State of alarm: $id to $activeState")
         }
     }

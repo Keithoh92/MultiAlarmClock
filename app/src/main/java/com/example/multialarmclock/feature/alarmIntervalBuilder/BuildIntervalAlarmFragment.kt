@@ -30,10 +30,10 @@ import kotlin.collections.ArrayList
 
 /**
  * A simple [Fragment] subclass.
- * Use the [AlarmIntervalBuilder.newInstance] factory method to
+ * Use the [BuildIntervalAlarmFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AlarmIntervalBuilder : Fragment() {
+class BuildIntervalAlarmFragment : Fragment() {
 
     private lateinit var binding: ActivityBuildNewAlarmBinding
     @RequiresApi(Build.VERSION_CODES.P)
@@ -205,7 +205,7 @@ class AlarmIntervalBuilder : Fragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance() = AlarmIntervalBuilder()
+        fun newInstance() = BuildIntervalAlarmFragment()
 
     }
 
