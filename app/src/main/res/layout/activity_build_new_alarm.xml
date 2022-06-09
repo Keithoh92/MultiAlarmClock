@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="dataModel"
-            type="com.example.multialarmclock.classes.AlarmViewModel" />
+            type="com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmViewModel" />
         <variable
             name="timeViewModel"
             type="com.example.multialarmclock.classes.TimeViewModel" />

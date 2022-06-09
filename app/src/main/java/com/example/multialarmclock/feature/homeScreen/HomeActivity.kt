@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.multialarmclock.R
-import com.example.multialarmclock.data.BuildNewAlarmModel
+import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmActivity
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -58,9 +58,7 @@ class HomeActivity : AppCompatActivity() {
         }
     )
 
-    private val recyclerView:RecyclerView by lazy {
-        findViewById(R.id.recyclerview)
-    }
+    private val recyclerView:RecyclerView by lazy { findViewById(R.id.recyclerview) }
 
     @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -98,7 +96,7 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 
-    private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmModel>) {
+    private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmDao>) {
         if(lastCreatedAlarm.isNotEmpty()) {
             daysChosen.text = lastCreatedAlarm[0].daysSelected
             onOffSignal.text = if (lastCreatedAlarm[0].active) ":ON" else ":OFF"

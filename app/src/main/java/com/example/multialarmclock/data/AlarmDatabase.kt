@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [BuildNewAlarmModel::class], version = 1, exportSchema = false)
+@Database(entities = [BuildNewAlarmDao::class], version = 1, exportSchema = false)
 abstract class AlarmDatabase: RoomDatabase() {
 
     abstract fun alarmDao(): AlarmDao

@@ -1,6 +1,6 @@
 package com.example.multialarmclock
 
-import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildNewAlarm
+import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmFragment
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -13,7 +13,7 @@ import com.google.common.truth.Truth
 class TimeFormatMethodTest {
 
     val cal = Calendar.getInstance()
-    val buildNewAlarm = BuildNewAlarm()
+    val buildNewAlarm = BuildIntervalAlarmFragment()
 
 
     fun formatTimeForDB1(hour:Int, minute:Int): String {
