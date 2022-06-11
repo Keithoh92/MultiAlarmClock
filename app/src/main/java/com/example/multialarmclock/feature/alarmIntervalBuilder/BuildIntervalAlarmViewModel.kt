@@ -1,12 +1,11 @@
-package com.example.multialarmclock.classes
+package com.example.multialarmclock.feature.alarmIntervalBuilder
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.multialarmclock.data.AlarmDatabase
 import com.example.multialarmclock.data.AlarmRepository
-import com.example.multialarmclock.data.BuildNewAlarmModel
+import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.feature.base.liveData.SingleLiveEvent
 import com.example.multialarmclock.feature.base.viewModel.AlarmAppViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,16 +13,16 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
-class AlarmViewModel(
+class BuildIntervalAlarmViewModel(
     application: Application,
     private val alarmRepository: AlarmRepository
     ): AlarmAppViewModel() {
 
-    private val _readAllData = SingleLiveEvent<List<BuildNewAlarmModel>>()
-    val readAllData = _readAllData as LiveData<List<BuildNewAlarmModel>>
+    private val _readAllData = SingleLiveEvent<List<BuildNewAlarmDao>>()
+    val readAllData = _readAllData as LiveData<List<BuildNewAlarmDao>>
 
-    private val _readLastEntered = SingleLiveEvent<List<BuildNewAlarmModel>>()
-    val readLastEntered = _readLastEntered as LiveData<List<BuildNewAlarmModel>>
+    private val _readLastEntered = SingleLiveEvent<List<BuildNewAlarmDao>>()
+    val readLastEntered = _readLastEntered as LiveData<List<BuildNewAlarmDao>>
 
     fun getAllAlarms() = viewModelScope.launch {
         _readAllData.postCall(alarmRepository.fetchAllAlarms())
@@ -33,7 +32,7 @@ class AlarmViewModel(
         _readLastEntered.postCall(alarmRepository.getLastSavedAlarm())
     }
 
-    fun addAlarm(buildAlarm:BuildNewAlarmModel){
+    fun addAlarm(buildAlarm:BuildNewAlarmDao){
         viewModelScope.launch(Dispatchers.IO){
             alarmRepository.addAlarm(buildAlarm)
         }

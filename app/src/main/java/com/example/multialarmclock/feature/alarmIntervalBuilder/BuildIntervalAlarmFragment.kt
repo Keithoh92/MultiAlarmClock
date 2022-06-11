@@ -19,9 +19,8 @@ import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.ViewModelProvider
 import com.example.multialarmclock.R
-import com.example.multialarmclock.classes.AlarmViewModel
 import com.example.multialarmclock.classes.TimeViewModel
-import com.example.multialarmclock.data.BuildNewAlarmModel
+import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,46 +39,45 @@ class BuildIntervalAlarmFragment : Fragment() {
     internal lateinit var slider: FluidSlider
 
     @InternalCoroutinesApi
-    private lateinit var mAlarmViewModel: AlarmViewModel
-    internal lateinit var myTimeDisplayViewmodel: TimeViewModel
+    private lateinit var mBuildIntervalAlarmViewModel: BuildIntervalAlarmViewModel
 
     val cal = Calendar.getInstance()
 
-    internal lateinit var alarmName: EditText
+    private lateinit var alarmName: EditText
 
-    internal lateinit var toggleOn: RadioButton
-    internal lateinit var toggleOff: RadioButton
+    private lateinit var toggleOn: RadioButton
+    private lateinit var toggleOff: RadioButton
 
-    internal lateinit var daysSelected:ArrayList<String>
-    internal lateinit var cbDay1: CheckBox
-    internal lateinit var cbDay2: CheckBox
-    internal lateinit var cbDay3: CheckBox
-    internal lateinit var cbDay4: CheckBox
-    internal lateinit var cbDay5: CheckBox
-    internal lateinit var cbDay6: CheckBox
-    internal lateinit var cbDay7: CheckBox
+    private lateinit var daysSelected:ArrayList<String>
+    private lateinit var cbDay1: CheckBox
+    private lateinit var cbDay2: CheckBox
+    private lateinit var cbDay3: CheckBox
+    private lateinit var cbDay4: CheckBox
+    private lateinit var cbDay5: CheckBox
+    private lateinit var cbDay6: CheckBox
+    private lateinit var cbDay7: CheckBox
 
-    internal lateinit var startTimePicker: TimePicker
-    internal lateinit var endTimePicker: TimePicker
-    internal lateinit var timeRangeCV: CardView
+    private lateinit var startTimePicker: TimePicker
+    private lateinit var endTimePicker: TimePicker
+    private lateinit var timeRangeCV: CardView
 
-    internal lateinit var startTimeTv: TextView
-    internal lateinit var endTimeTV: TextView
-    internal var startTimeTemp:String? = null
-    internal var endTimeTemp:String? = null
+    private lateinit var startTimeTv: TextView
+    private lateinit var endTimeTV: TextView
+    private var startTimeTemp:String? = null
+    private var endTimeTemp:String? = null
 
-    internal lateinit var rt_tv: TextView
+    private lateinit var rt_tv: TextView
     internal lateinit var ringtoneDefault: Ringtone
-    internal var chosenRingtone: Ringtone? = null
-    internal lateinit var currentRingtone: Uri
+    private var chosenRingtone: Ringtone? = null
+    private lateinit var currentRingtone: Uri
     var chosenRTUri: Uri?=null
-    internal lateinit var intervalPicker: NumberPicker
+    private lateinit var intervalPicker: NumberPicker
 
 
     @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mBuildIntervalAlarmViewModel = ViewModelProvider(this).get(BuildIntervalAlarmViewModel::class.java)
 
 
         binding.shapeCorner
@@ -212,7 +210,7 @@ class BuildIntervalAlarmFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-        mAlarmViewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
+        mBuildIntervalAlarmViewModel = ViewModelProvider(this).get(BuildIntervalAlarmViewModel::class.java)
 
         val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
         //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
@@ -224,8 +222,8 @@ class BuildIntervalAlarmFragment : Fragment() {
         val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
         val interval = intervalPicker.value
         val time = cal.time.toString()
-        val alarm = BuildNewAlarmModel(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time, true)
-        mAlarmViewModel.addAlarm(alarm)
+        val alarm = BuildNewAlarmDao(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time, true)
+        mBuildIntervalAlarmViewModel.addAlarm(alarm)
         Toast.makeText(activity, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
 
     }

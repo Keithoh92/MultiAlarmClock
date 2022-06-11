@@ -1,14 +1,14 @@
 package com.example.multialarmclock.data
 
-import androidx.lifecycle.LiveData
+import org.koin.core.component.KoinComponent
 
 class AlarmRepository(private val alarmDao: AlarmDao) {
 
 //    val readLastEntered: LiveData<List<BuildNewAlarmModel>> = alarmDao.readLastEntered()
 //    val readAllData: LiveData<List<BuildNewAlarmModel>> = alarmDao.readAllData()
 
-    suspend fun addAlarm(buildNewAlarmModel: BuildNewAlarmModel){
-        alarmDao.addAlarm(buildNewAlarmModel)
+    suspend fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao){
+        alarmDao.addAlarm(buildNewAlarmDao)
     }
 
     fun deleteAlarm(id: Int) {
