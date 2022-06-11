@@ -9,7 +9,7 @@ import androidx.room.Query
 interface AlarmDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao)
+    fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao): Long
 
     @Query("SELECT * FROM my_alarms ORDER BY id DESC")
     fun readAllData(): List<BuildNewAlarmDao>

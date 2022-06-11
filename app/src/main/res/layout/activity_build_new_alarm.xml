@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="dataModel"
-            type="com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmViewModel" />
+            type="com.example.multialarmclock.feature.activity.homeScreen.HomeScreenViewModel" />
         <variable
             name="timeViewModel"
             type="com.example.multialarmclock.classes.TimeViewModel" />
@@ -164,7 +164,7 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:context=".feature.alarmIntervalBuilder.BuildNewAlarm"
+                tools:context=".feature.activity.alarmIntervalBuilder.BuildNewAlarm"
                 android:background="#000">
 
             <RelativeLayout

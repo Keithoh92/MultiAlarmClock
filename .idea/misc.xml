@@ -33,7 +33,9 @@
         <entry key="..\:/Users/eire1/AndroidStudioProjects/MultiAlarmClock/app/src/main/res/layout/toolbar.xml" value="0.17255434782608695" />
         <entry key="..\:/Users/eire1/AndroidStudioProjects/MultiAlarmClock/app/src/main/res/menu/menu_main.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/layout/activity_build_interval_alarm.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_build_new_alarm.xml" value="0.12604166666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1296875" />
+        <entry key="app/src/main/res/layout/fragment_alarm_interval_builder.xml" value="0.12604166666666666" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.12777777777777777" />
       </map>
     </option>

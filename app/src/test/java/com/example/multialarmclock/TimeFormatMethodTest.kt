@@ -1,6 +1,6 @@
 package com.example.multialarmclock
 
-import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmFragment
+import com.example.multialarmclock.feature.activity.alarmIntervalBuilder.BuildIntervalAlarmFragment
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith

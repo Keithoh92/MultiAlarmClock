@@ -1,4 +1,4 @@
-package com.example.multialarmclock.feature.homeScreen
+package com.example.multialarmclock.feature.activity.homeScreen
 
 import android.content.Context
 import android.content.Intent
@@ -8,13 +8,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,10 +20,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.ActivityMainBinding
-import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmActivity
+import com.example.multialarmclock.feature.activity.alarmIntervalBuilder.BuildIntervalAlarmActivity
 import kotlinx.coroutines.InternalCoroutinesApi
-import com.example.multialarmclock.feature.homeScreen.AlarmsListAdapter.ListAdapter
-import org.koin.android.ext.android.inject
+import com.example.multialarmclock.feature.activity.homeScreen.AlarmsListAdapter.ListAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : AppCompatActivity() {
@@ -74,7 +71,7 @@ class HomeActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         addSeparatorDecorationToRecyclerView()
 
-        intitaliseViewModel()
+        initialiseViewModel()
         setupObservers()
 
         setOnItemTouchHelper()
@@ -83,6 +80,11 @@ class HomeActivity : AppCompatActivity() {
 
         cvBottomRight.setOnClickListener { openAlarmBuilder() }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initialiseViewModel()
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -118,7 +120,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun intitaliseViewModel() {
+    private fun initialiseViewModel() {
         viewModel.getAllAlarms()
         viewModel.getLastSavedAlarm()
     }
