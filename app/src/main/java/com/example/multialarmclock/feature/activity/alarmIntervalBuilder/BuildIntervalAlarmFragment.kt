@@ -1,4 +1,4 @@
-package com.example.multialarmclock.feature.alarmIntervalBuilder
+package com.example.multialarmclock.feature.activity.alarmIntervalBuilder
 
 import android.app.Activity
 import android.content.Intent
@@ -17,13 +17,12 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
-import androidx.lifecycle.ViewModelProvider
 import com.example.multialarmclock.R
-import com.example.multialarmclock.classes.TimeViewModel
 import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -38,8 +37,7 @@ class BuildIntervalAlarmFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.P)
     internal lateinit var slider: FluidSlider
 
-    @InternalCoroutinesApi
-    private lateinit var mBuildIntervalAlarmViewModel: BuildIntervalAlarmViewModel
+    private val viewModel by viewModel<BuildIntervalAlarmViewModel>()
 
     val cal = Calendar.getInstance()
 
@@ -77,19 +75,14 @@ class BuildIntervalAlarmFragment : Fragment() {
     @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBuildIntervalAlarmViewModel = ViewModelProvider(this).get(BuildIntervalAlarmViewModel::class.java)
 
-
-        binding.shapeCorner
-        binding.radioGroup
-
-        toggleOff.isChecked = true
-        if(toggleOff.isChecked){
-            toggleOn.isChecked = false
-        }
-        if(toggleOn.isChecked){
-            toggleOff.isChecked = false
-        }
+//        toggleOff.isChecked = true
+//        if(toggleOff.isChecked){
+//            toggleOn.isChecked = false
+//        }
+//        if(toggleOn.isChecked){
+//            toggleOff.isChecked = false
+//        }
 
     }
 
@@ -102,6 +95,10 @@ class BuildIntervalAlarmFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val root =  inflater.inflate(R.layout.fragment_alarm_interval_builder, container, false)
+
+//        binding = ActivityBuildNewAlarmBinding.inflate(R.layout.fragment_alarm_interval_builder, container, false)
+//        binding.shapeCorner
+//        binding.radioGroup
 
         ////////////////////////Initialise Views///////////////////////////////////
         alarmName = root.findViewById(R.id.edit_name) //Alarm Name TextView
@@ -126,10 +123,10 @@ class BuildIntervalAlarmFragment : Fragment() {
             String.format("%02d", it)
         }
 
-
+        setupObserver()
 
         onClickTime(root)
-        ringtoneManager()
+//        ringtoneManager()
         //////////////////////////////////////////////////////////////////////////////////////////////
 
         currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(activity, RingtoneManager.TYPE_ALARM)
@@ -196,9 +193,20 @@ class BuildIntervalAlarmFragment : Fragment() {
         return root
     }
 
-    private fun ringtoneManager() {
-        TODO("Not yet implemented")
+    private fun setupObserver() {
+        viewModel.onSuccess.observe(viewLifecycleOwner) { onSuccess ->
+            if (onSuccess.toInt() != -1) {
+                Toast.makeText(activity, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
+                activity?.finish()
+            } else {
+                Toast.makeText(activity, "Something went wrong, please try again", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
+//    private fun ringtoneManager() {
+//        TODO("Not yet implemented")
+//    }
 
     companion object {
 
@@ -210,23 +218,30 @@ class BuildIntervalAlarmFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-        mBuildIntervalAlarmViewModel = ViewModelProvider(this).get(BuildIntervalAlarmViewModel::class.java)
 
-        val usersAlarmName = if(alarmName != null) alarmName.text.toString() else "alarm"          //Alarm name
-        //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
-        var alarmDays = getCheckedDays()                                                            //Days Selected
+        val newAlarm = buildNewAlarm()
+        Log.d("BuildIntervalAlarm", "newAlarmData = $newAlarm")
 
-        var weekly = toggleOn.isChecked     //Is set to weekly?
-        val startTime = if(startTimePicker.minute < 10) "${startTimePicker.hour}:0${startTimePicker.minute}" else "${startTimePicker.hour}:${startTimePicker.minute}"
-        val endTime = if(endTimePicker.minute < 10) "${endTimePicker.hour}:0${endTimePicker.minute}" else "${endTimePicker.hour}:${endTimePicker.minute}"
-        val ringtoneChosen:String = chosenRTUri.toString() ?: currentRingtone.toString()
-        val interval = intervalPicker.value
-        val time = cal.time.toString()
-        val alarm = BuildNewAlarmDao(0, usersAlarmName, alarmDays, weekly, startTime, endTime, ringtoneChosen, interval, time, true)
-        mBuildIntervalAlarmViewModel.addAlarm(alarm)
-        Toast.makeText(activity, "Successfully Saved Your New Alarm", Toast.LENGTH_SHORT).show()
-
+        viewModel.addAlarm(newAlarm)
     }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun buildNewAlarm(): BuildNewAlarmDao {
+        return BuildNewAlarmDao(
+            0,
+            alarmName = if(alarmName.text.isNotEmpty()) alarmName.text.toString() else "alarm",
+            //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
+            daysSelected = getCheckedDays(),
+            weekly = toggleOn.isChecked,
+            startTime = if(startTimePicker.minute < 10) "${startTimePicker.hour}:0${startTimePicker.minute}" else "${startTimePicker.hour}:${startTimePicker.minute}",
+            endTime = if(endTimePicker.minute < 10) "${endTimePicker.hour}:0${endTimePicker.minute}" else "${endTimePicker.hour}:${endTimePicker.minute}",
+            sound = chosenRTUri.toString(),
+            interval = intervalPicker.value,
+            time = cal.time.toString(),
+            active = true
+        )
+    }
+
     private fun inputCheck(usersAlarmName:String, alarmDays:ArrayList<String>, startTime:String, endTime:String, interval:Int): Boolean {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
     }

@@ -1,4 +1,4 @@
-package com.example.multialarmclock.feature.homeScreen.AlarmsListAdapter
+package com.example.multialarmclock.feature.activity.homeScreen.AlarmsListAdapter
 
 import android.annotation.SuppressLint
 import android.util.Log

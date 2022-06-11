@@ -12,7 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".feature.homeScreen.HomeActivity"
+        tools:context=".feature.activity.homeScreen.HomeActivity"
         android:background="@color/dark_cv">
 
         <androidx.appcompat.widget.Toolbar

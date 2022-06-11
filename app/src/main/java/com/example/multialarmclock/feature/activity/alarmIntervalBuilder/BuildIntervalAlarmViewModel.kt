@@ -1,6 +1,5 @@
-package com.example.multialarmclock.feature.homeScreen
+package com.example.multialarmclock.feature.activity.alarmIntervalBuilder
 
-import dagger.hilt.android.lifecycle.HiltViewModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -12,8 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
-//@HiltViewModel
-class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAppViewModel(), KoinComponent {
+class BuildIntervalAlarmViewModel (
+    private val alarmRepository: AlarmRepository
+    ): AlarmAppViewModel(), KoinComponent {
 
     private val _readAllData = SingleLiveEvent<List<BuildNewAlarmDao>>()
     val readAllData = _readAllData as LiveData<List<BuildNewAlarmDao>>
@@ -21,12 +21,22 @@ class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAp
     private val _readLastEntered = SingleLiveEvent<List<BuildNewAlarmDao>>()
     val readLastEntered = _readLastEntered as LiveData<List<BuildNewAlarmDao>>
 
+    val onSuccess = SingleLiveEvent<Long>()
+
     fun getAllAlarms() = viewModelScope.launch {
         _readAllData.postCall(alarmRepository.fetchAllAlarms())
     }
 
     fun getLastSavedAlarm() = viewModelScope.launch {
         _readLastEntered.postCall(alarmRepository.getLastSavedAlarm())
+    }
+
+    fun addAlarm(buildAlarm:BuildNewAlarmDao) {
+        viewModelScope.launch(Dispatchers.IO){
+            Log.d("BuildNewAlarmVM", "Adding Alarm = $buildAlarm")
+            val success = alarmRepository.addAlarm(buildAlarm)
+            onSuccess.postCall(success)
+        }
     }
 
     fun deleteAlarm(id: Int){

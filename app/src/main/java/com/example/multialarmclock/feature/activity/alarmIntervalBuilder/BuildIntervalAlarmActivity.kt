@@ -1,4 +1,4 @@
-package com.example.multialarmclock.feature.alarmIntervalBuilder
+package com.example.multialarmclock.feature.activity.alarmIntervalBuilder
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
