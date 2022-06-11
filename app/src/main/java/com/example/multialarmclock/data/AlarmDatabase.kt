@@ -10,7 +10,7 @@ import kotlinx.coroutines.internal.synchronized
 @Database(entities = [BuildNewAlarmDao::class], version = 1, exportSchema = false)
 abstract class AlarmDatabase: RoomDatabase() {
 
-    abstract fun alarmDao(): AlarmDao
+    abstract val alarmDao: AlarmDao
 
     companion object{
         @Volatile

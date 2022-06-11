@@ -1,4 +1,4 @@
-package com.example.multialarmclock.list
+package com.example.multialarmclock.feature.homeScreen.AlarmsListAdapter
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -12,7 +12,6 @@ import com.example.multialarmclock.data.BuildNewAlarmDao
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import java.lang.ref.WeakReference
-
 
 class ListAdapter(private val clickListener: (id: Int) -> Unit, private val switchListener: (id: Int, active: Boolean) -> Unit ): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 

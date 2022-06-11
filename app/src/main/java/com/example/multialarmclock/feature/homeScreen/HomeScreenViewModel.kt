@@ -10,9 +10,10 @@ import com.example.multialarmclock.feature.base.liveData.SingleLiveEvent
 import com.example.multialarmclock.feature.base.viewModel.AlarmAppViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
 
-@HiltViewModel
-class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAppViewModel() {
+//@HiltViewModel
+class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAppViewModel(), KoinComponent {
 
     private val _readAllData = SingleLiveEvent<List<BuildNewAlarmDao>>()
     val readAllData = _readAllData as LiveData<List<BuildNewAlarmDao>>

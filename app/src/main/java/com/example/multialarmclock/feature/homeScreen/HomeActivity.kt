@@ -24,15 +24,15 @@ import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.ActivityMainBinding
 import com.example.multialarmclock.feature.alarmIntervalBuilder.BuildIntervalAlarmActivity
 import kotlinx.coroutines.InternalCoroutinesApi
-import com.example.multialarmclock.list.ListAdapter
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.multialarmclock.feature.homeScreen.AlarmsListAdapter.ListAdapter
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val viewModel: HomeScreenViewModel by viewModels()
+    private val viewModel by viewModel<HomeScreenViewModel>()
 
     //Setup for last used cardview
     private lateinit var daysChosen: TextView
@@ -79,7 +79,7 @@ class HomeActivity : AppCompatActivity() {
 
         setOnItemTouchHelper()
 
-        intitialiseViews();
+        intitialiseViews()
 
         cvBottomRight.setOnClickListener { openAlarmBuilder() }
 
@@ -87,13 +87,13 @@ class HomeActivity : AppCompatActivity() {
 
     @OptIn(InternalCoroutinesApi::class)
     private fun setupObservers() {
-        viewModel.readAllData.observe(this, Observer { alarm ->
+        viewModel.readAllData.observe(this) { alarm ->
             adapter.setData(alarm)
-        })
+        }
 
-        viewModel.readLastEntered.observe(this, Observer { alarm ->
+        viewModel.readLastEntered.observe(this) { alarm ->
             populateFirstCardViewWithLastCreatedAlarm(alarm)
-        })
+        }
     }
 
     private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmDao>) {
