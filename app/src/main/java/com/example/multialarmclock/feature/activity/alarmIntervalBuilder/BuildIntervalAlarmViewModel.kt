@@ -15,21 +15,9 @@ class BuildIntervalAlarmViewModel (
     private val alarmRepository: AlarmRepository
     ): AlarmAppViewModel(), KoinComponent {
 
-    private val _readAllData = SingleLiveEvent<List<BuildNewAlarmDao>>()
-    val readAllData = _readAllData as LiveData<List<BuildNewAlarmDao>>
-
-    private val _readLastEntered = SingleLiveEvent<List<BuildNewAlarmDao>>()
-    val readLastEntered = _readLastEntered as LiveData<List<BuildNewAlarmDao>>
-
     val onSuccess = SingleLiveEvent<Long>()
 
-    fun getAllAlarms() = viewModelScope.launch {
-        _readAllData.postCall(alarmRepository.fetchAllAlarms())
-    }
-
-    fun getLastSavedAlarm() = viewModelScope.launch {
-        _readLastEntered.postCall(alarmRepository.getLastSavedAlarm())
-    }
+    fun getAlarmCount(): Int = alarmRepository.getCountOfAlarmsInDB()
 
     fun addAlarm(buildAlarm:BuildNewAlarmDao) {
         viewModelScope.launch(Dispatchers.IO){
@@ -38,19 +26,4 @@ class BuildIntervalAlarmViewModel (
             onSuccess.postCall(success)
         }
     }
-
-    fun deleteAlarm(id: Int){
-        viewModelScope.launch(Dispatchers.IO) {
-            alarmRepository.deleteAlarm(id)
-            Log.d("AlarmViewModel", "Deleting alarm")
-        }
-    }
-
-    fun updateActiveState(activeState: Boolean, id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            alarmRepository.updateActiveState(activeState, id)
-            Log.d("AlarmViewModel", "Updating State of alarm: $id to $activeState")
-        }
-    }
-
 }

@@ -102,7 +102,7 @@
                         </TextView>
 
                         <TimePicker
-                            android:id="@+id/picker1"
+                            android:id="@+id/start_time_picker"
                             android:layout_width="match_parent"
                             android:layout_height="130dp"
                             android:paddingBottom="10dp"
@@ -129,7 +129,7 @@
                         </TextView>
 
                         <TimePicker
-                            android:id="@+id/picker2"
+                            android:id="@+id/end_time_picker"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:paddingBottom="10dp"

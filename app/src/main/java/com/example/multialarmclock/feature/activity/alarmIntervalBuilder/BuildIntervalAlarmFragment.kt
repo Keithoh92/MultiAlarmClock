@@ -16,116 +16,50 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.cardview.widget.CardView
-import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmDao
-import com.ramotion.fluidslider.FluidSlider
-import kotlinx.coroutines.InternalCoroutinesApi
+import com.example.multialarmclock.databinding.FragmentAlarmIntervalBuilderBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 import kotlin.collections.ArrayList
 
-/**
- * A simple [Fragment] subclass.
- * Use the [BuildIntervalAlarmFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class BuildIntervalAlarmFragment : Fragment() {
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    internal lateinit var slider: FluidSlider
+    private lateinit var binding: FragmentAlarmIntervalBuilderBinding
 
     private val viewModel by viewModel<BuildIntervalAlarmViewModel>()
 
-    val cal = Calendar.getInstance()
-
-    private lateinit var alarmName: EditText
-
-    private lateinit var toggleOn: RadioButton
-    private lateinit var toggleOff: RadioButton
+    private val cal: Calendar = Calendar.getInstance()
 
     private lateinit var daysSelected:ArrayList<String>
-    private lateinit var cbDay1: CheckBox
-    private lateinit var cbDay2: CheckBox
-    private lateinit var cbDay3: CheckBox
-    private lateinit var cbDay4: CheckBox
-    private lateinit var cbDay5: CheckBox
-    private lateinit var cbDay6: CheckBox
-    private lateinit var cbDay7: CheckBox
 
-    private lateinit var startTimePicker: TimePicker
-    private lateinit var endTimePicker: TimePicker
-    private lateinit var timeRangeCV: CardView
-
-    private lateinit var startTimeTv: TextView
-    private lateinit var endTimeTV: TextView
     private var startTimeTemp:String? = null
     private var endTimeTemp:String? = null
 
-    private lateinit var rt_tv: TextView
     internal lateinit var ringtoneDefault: Ringtone
     private var chosenRingtone: Ringtone? = null
     private lateinit var currentRingtone: Uri
     var chosenRTUri: Uri?=null
-    private lateinit var intervalPicker: NumberPicker
 
-
-    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        toggleOff.isChecked = true
-//        if(toggleOff.isChecked){
-//            toggleOn.isChecked = false
-//        }
-//        if(toggleOn.isChecked){
-//            toggleOff.isChecked = false
-//        }
-
     }
 
-
-    @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val root =  inflater.inflate(R.layout.fragment_alarm_interval_builder, container, false)
+    ): View {
+        binding = FragmentAlarmIntervalBuilderBinding.inflate(layoutInflater)
 
-//        binding = ActivityBuildNewAlarmBinding.inflate(R.layout.fragment_alarm_interval_builder, container, false)
-//        binding.shapeCorner
-//        binding.radioGroup
-
-        ////////////////////////Initialise Views///////////////////////////////////
-        alarmName = root.findViewById(R.id.edit_name) //Alarm Name TextView
-        //Alarm Weekly switch button
-        toggleOn = root.findViewById<RadioButton>(R.id.toggle_on)
-        toggleOff = root.findViewById<RadioButton>(R.id.toggle_off)
-
-        //ALARM DAY CHOICES
-        cbDay1 = root.findViewById(R.id.cb_day1)
-        cbDay2 = root.findViewById(R.id.cb_day2)
-        cbDay3 = root.findViewById(R.id.cb_day3)
-        cbDay4 = root.findViewById(R.id.cb_day4)
-        cbDay5 = root.findViewById(R.id.cb_day5)
-        cbDay6 = root.findViewById(R.id.cb_day6)
-        cbDay7 = root.findViewById(R.id.cb_day7)
-        timeRangeCV = root.findViewById(R.id.time_range_picker) //cardview for start &  end time pickers
-        //Alarm to go off every X minutes
-        intervalPicker = root.findViewById(R.id.interval_picker)
-        intervalPicker.minValue = 0
-        intervalPicker.maxValue = 60
-        intervalPicker.setFormatter {
+        binding.intervalPicker.minValue = 0
+        binding.intervalPicker.maxValue = 60
+        binding.intervalPicker.setFormatter {
             String.format("%02d", it)
         }
 
         setupObserver()
 
-        onClickTime(root)
-//        ringtoneManager()
-        //////////////////////////////////////////////////////////////////////////////////////////////
+        onClickTime(binding.root)
 
         currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(activity, RingtoneManager.TYPE_ALARM)
 
@@ -133,30 +67,33 @@ class BuildIntervalAlarmFragment : Fragment() {
         val rt1 = ringtoneDefault.getTitle(activity)
         Log.d("RT", rt1.toString())
 
-        rt_tv = root.findViewById(R.id.ringtone_tv)
-        rt_tv.text = "Current:\n"+rt1.toString()
+        binding.ringtoneTv.text = "Current:\n"+rt1.toString()
 
-        val playButton = root.findViewById<ImageButton>(R.id.play_button)
-        val stopButton = root.findViewById<ImageButton>(R.id.stop_button)
-        val chooseRingtone = root.findViewById<ImageButton>(R.id.choose_ringtone)
+        initialiseClickListeners()
 
-        playButton.setOnClickListener{
+        return binding.root
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun initialiseClickListeners() {
+        binding.playButton.setOnClickListener{
             if(chosenRingtone == null){
                 ringtoneDefault.play()
             }else{
                 chosenRingtone!!.play()
             }
-            playButton.visibility = View.INVISIBLE
-            stopButton.visibility = View.VISIBLE
+            binding.playButton.visibility = View.INVISIBLE
+            binding.stopButton.visibility = View.VISIBLE
         }
-        stopButton.setOnClickListener{
+
+        binding.stopButton.setOnClickListener{
             if(chosenRingtone == null){
                 ringtoneDefault.stop()
             }else{
                 chosenRingtone!!.stop()
             }
-            stopButton.visibility = View.INVISIBLE
-            playButton.visibility = View.VISIBLE
+            binding.stopButton.visibility = View.INVISIBLE
+            binding.playButton.visibility = View.VISIBLE
         }
 
         var getResult =
@@ -165,11 +102,11 @@ class BuildIntervalAlarmFragment : Fragment() {
                     chosenRTUri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                     val chosenRingtone = RingtoneManager.getRingtone(activity, chosenRTUri)
                     val rt1 = chosenRingtone.getTitle(activity)
-                    rt_tv.text = "Current:\n"+rt1.toString()
+                    binding.ringtoneTv.text = "Current:\n"+rt1.toString()
                 }
             }
 
-        chooseRingtone.setOnClickListener{
+        binding.chooseRingtone.setOnClickListener{
             val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE)
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alarm Sound")
@@ -179,16 +116,13 @@ class BuildIntervalAlarmFragment : Fragment() {
             getResult.launch(intent)
         }
 
-        val saveButton = root.findViewById(R.id.save_button) as Button
-        saveButton.setOnClickListener{
+        binding.saveButton.setOnClickListener{
             if( startTimeTemp != null && endTimeTemp != null) {
                 insertNewAlarmToDB()
             } else {
                 Toast.makeText(activity, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
             }
         }
-
-        return root
     }
 
     private fun setupObserver() {
@@ -202,21 +136,8 @@ class BuildIntervalAlarmFragment : Fragment() {
         }
     }
 
-//    private fun ringtoneManager() {
-//        TODO("Not yet implemented")
-//    }
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance() = BuildIntervalAlarmFragment()
-
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
-    @InternalCoroutinesApi
     private fun insertNewAlarmToDB() {
-
         val newAlarm = buildNewAlarm()
         Log.d("BuildIntervalAlarm", "newAlarmData = $newAlarm")
 
@@ -227,14 +148,13 @@ class BuildIntervalAlarmFragment : Fragment() {
     private fun buildNewAlarm(): BuildNewAlarmDao {
         return BuildNewAlarmDao(
             0,
-            alarmName = if(alarmName.text.isNotEmpty()) alarmName.text.toString() else "alarm",
-            //TODO("Got to get nuber of alarms in DB for this user and give the name plus num of alarms in DB to the name")
+            alarmName = if(binding.editName.text.isNotEmpty()) binding.editName.text.toString() else "alarm ${viewModel.getAlarmCount().plus(1)}",
             daysSelected = getCheckedDays(),
-            weekly = toggleOn.isChecked,
-            startTime = if(startTimePicker.minute < 10) "${startTimePicker.hour}:0${startTimePicker.minute}" else "${startTimePicker.hour}:${startTimePicker.minute}",
-            endTime = if(endTimePicker.minute < 10) "${endTimePicker.hour}:0${endTimePicker.minute}" else "${endTimePicker.hour}:${endTimePicker.minute}",
+            weekly = binding.toggleOn.isChecked,
+            startTime = if(binding.startTimePicker.minute < 10) "${binding.startTimePicker.hour}:0${binding.startTimePicker.minute}" else "${binding.startTimePicker.hour}:${binding.startTimePicker.minute}",
+            endTime = if(binding.endTimePicker.minute < 10) "${binding.endTimePicker.hour}:0${binding.endTimePicker.minute}" else "${binding.endTimePicker.hour}:${binding.endTimePicker.minute}",
             sound = chosenRTUri.toString(),
-            interval = intervalPicker.value,
+            interval = binding.intervalPicker.value,
             time = cal.time.toString(),
             active = true
         )
@@ -246,22 +166,17 @@ class BuildIntervalAlarmFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun onClickTime(root: View) {
-        startTimePicker = root.findViewById(R.id.picker1)
-        endTimePicker = root.findViewById(R.id.picker2)
 
-        startTimePicker.hour = 8
-        startTimePicker.minute = 0
-        endTimePicker.hour = 9
-        endTimePicker.minute = 0
+        binding.startTimePicker.hour = 8
+        binding.startTimePicker.minute = 0
+        binding.endTimePicker.hour = 9
+        binding.endTimePicker.minute = 0
 
-        startTimeTv = root.findViewById(R.id.start_time_tv)
-        endTimeTV = root.findViewById(R.id.end_time_tv)
+        binding.startTimeTv.text = "Start Time: 8:00 AM"
+        binding.endTimeTv.text = "End Time: 9:00 AM"
 
-        startTimeTv.text = "Start Time: 8:00 AM"
-        endTimeTV.text = "End Time: 9:00 AM"
-
-        startTimePicker.setIs24HourView(true)
-        startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+        binding.startTimePicker.setIs24HourView(true)
+        binding.startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
             var am_pm = ""
             //AM_PM Decider Logic
             when {hour == 0 -> { hour += 12
@@ -276,11 +191,11 @@ class BuildIntervalAlarmFragment : Fragment() {
             val min1 = if (minute < 10) "00" else minute
             val startTimeMsg = "Start Time: $hour:$min1 $am_pm"
             startTimeTemp = "$hour:$min1 $am_pm"
-            startTimeTv.text = startTimeMsg
+            binding.startTimeTv.text = startTimeMsg
         }
 
-        endTimePicker.setIs24HourView(true)
-        endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+        binding.endTimePicker.setIs24HourView(true)
+        binding.endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
             var am_pm = ""
             //AM_PM Decider Logic
             when {hour == 0 -> { hour += 12
@@ -292,43 +207,41 @@ class BuildIntervalAlarmFragment : Fragment() {
                 }
                 else -> am_pm = "AM"
             }
-            if (endTimeTV != null) {
-                val min1 = if (minute < 10) "00" else minute
-                val endTimeMsg = "End Time: $hour:$min1 $am_pm"
-                endTimeTemp = "$hour:$min1 $am_pm"
-                endTimeTV.text = endTimeMsg
-            }
+            val min1 = if (minute < 10) "00" else minute
+            val endTimeMsg = "End Time: $hour:$min1 $am_pm"
+            endTimeTemp = "$hour:$min1 $am_pm"
+            binding.endTimeTv.text = endTimeMsg
         }
     }
 
     fun getCheckedDays(): String {
         daysSelected = arrayListOf()
-        if(cbDay1.isChecked){
-            Log.d("DaysCheccked: ", cbDay1.text.toString())
+        if(binding.cbDay1.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay1.text.toString())
             daysSelected.add("Mon")
         }
-        if(cbDay2.isChecked){
-            Log.d("DaysCheccked: ", cbDay2.text.toString())
+        if(binding.cbDay2.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay2.text.toString())
             daysSelected.add("Tue")
         }
-        if(cbDay3.isChecked){
-            Log.d("DaysCheccked: ", cbDay3.text.toString())
+        if(binding.cbDay3.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay3.text.toString())
             daysSelected.add("Wed")
         }
-        if(cbDay4.isChecked){
-            Log.d("DaysCheccked: ", cbDay4.text.toString())
+        if(binding.cbDay4.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay4.text.toString())
             daysSelected.add("Thu")
         }
-        if(cbDay5.isChecked){
-            Log.d("DaysCheccked: ", cbDay5.text.toString())
+        if(binding.cbDay5.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay5.text.toString())
             daysSelected.add("Fri")
         }
-        if(cbDay6.isChecked){
-            Log.d("DaysCheccked: ", cbDay6.text.toString())
+        if(binding.cbDay6.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay6.text.toString())
             daysSelected.add("Sat")
         }
-        if(cbDay7.isChecked){
-            Log.d("DaysCheccked: ", cbDay7.text.toString())
+        if(binding.cbDay7.isChecked){
+            Log.d("DaysCheccked: ", binding.cbDay7.text.toString())
             daysSelected.add("Sun")
         }
         var separator = ""
@@ -341,11 +254,13 @@ class BuildIntervalAlarmFragment : Fragment() {
     }
 
     fun formatTimeForDB(hour:Int, minute:Int): String {
-
         val h = "%02d".format(if (hour < 12) hour else hour - 12)
         val m = "%02d".format(minute)
-
         return "$h:$m"
     }
 
+    companion object {
+        @JvmStatic
+        fun newInstance() = BuildIntervalAlarmFragment()
+    }
 }
