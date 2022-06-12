@@ -8,14 +8,17 @@ import androidx.room.Query
 @Dao
 interface AlarmDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao): Long
-
     @Query("SELECT * FROM my_alarms ORDER BY id DESC")
     fun readAllData(): List<BuildNewAlarmDao>
 
     @Query("SELECT * FROM my_alarms ORDER BY id DESC limit 1")
     fun readLastEntered(): List<BuildNewAlarmDao>
+
+    @Query("SELECT count(*) FROM my_alarms")
+    fun getCountOfAlarms(): Int
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao): Long
 
     @Query("DELETE FROM my_alarms WHERE id = :alarmId")
     fun deleteById(alarmId: Int)

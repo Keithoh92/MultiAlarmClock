@@ -4,8 +4,11 @@ import org.koin.core.component.KoinComponent
 
 class AlarmRepository(private val alarmDao: AlarmDao) {
 
-//    val readLastEntered: LiveData<List<BuildNewAlarmModel>> = alarmDao.readLastEntered()
-//    val readAllData: LiveData<List<BuildNewAlarmModel>> = alarmDao.readAllData()
+    fun fetchAllAlarms(): List<BuildNewAlarmDao> = alarmDao.readAllData()
+
+    fun getLastSavedAlarm(): List<BuildNewAlarmDao> = alarmDao.readLastEntered()
+
+    fun getCountOfAlarmsInDB(): Int = alarmDao.getCountOfAlarms()
 
     fun addAlarm(buildNewAlarmDao: BuildNewAlarmDao): Long {
         return alarmDao.addAlarm(buildNewAlarmDao)
@@ -18,9 +21,5 @@ class AlarmRepository(private val alarmDao: AlarmDao) {
     fun updateActiveState(active: Boolean, id: Int) {
         alarmDao.updateActiveState(active, id)
     }
-
-    fun fetchAllAlarms(): List<BuildNewAlarmDao> = alarmDao.readAllData()
-
-    fun getLastSavedAlarm(): List<BuildNewAlarmDao> = alarmDao.readLastEntered()
 
 }
