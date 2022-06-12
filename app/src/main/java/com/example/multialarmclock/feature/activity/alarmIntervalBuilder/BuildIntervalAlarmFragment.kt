@@ -19,7 +19,6 @@ import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmDao
-import com.example.multialarmclock.databinding.ActivityBuildNewAlarmBinding
 import com.ramotion.fluidslider.FluidSlider
 import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -33,7 +32,6 @@ import kotlin.collections.ArrayList
  */
 class BuildIntervalAlarmFragment : Fragment() {
 
-    private lateinit var binding: ActivityBuildNewAlarmBinding
     @RequiresApi(Build.VERSION_CODES.P)
     internal lateinit var slider: FluidSlider
 
