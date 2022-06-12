@@ -35,9 +35,10 @@ class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAp
         }
     }
 
-    fun updateActiveState(activeState: Boolean, id: Int) {
+    fun updateActiveState(id: Int, activeState: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             alarmRepository.updateActiveState(activeState, id)
+            getLastSavedAlarm()
             Log.d("AlarmViewModel", "Updating State of alarm: $id to $activeState")
         }
     }

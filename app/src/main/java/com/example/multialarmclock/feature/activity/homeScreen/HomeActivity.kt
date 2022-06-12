@@ -49,9 +49,11 @@ class HomeActivity : AppCompatActivity() {
     private val adapter = ListAdapter (
         { id ->
             viewModel.deleteAlarm(id)
+            viewModel.getLastSavedAlarm()
+            viewModel.readAllData
         },
         { id, active ->
-            viewModel.updateActiveState(active, id)
+            viewModel.updateActiveState(id, active)
         }
     )
 
@@ -64,7 +66,7 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_main)
 
-//        binding.mytoolbar
+        binding.mytoolbar
         setSupportActionBar(toolbar)
 
         recyclerView.adapter = adapter
