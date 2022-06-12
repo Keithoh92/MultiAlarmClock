@@ -13,7 +13,10 @@ import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import java.lang.ref.WeakReference
 
-class ListAdapter(private val clickListener: (id: Int) -> Unit, private val switchListener: (id: Int, active: Boolean) -> Unit ): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
+class ListAdapter(
+    private val clickListener: (id: Int) -> Unit,
+    private val switchListener: (id: Int, active: Boolean) -> Unit
+): RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     private var alarmList = mutableListOf<BuildNewAlarmDao>()
 
@@ -80,7 +83,7 @@ class ListAdapter(private val clickListener: (id: Int) -> Unit, private val swit
             clickListener.invoke(currentItem.id)
         }
 
-        holder.itemView.findViewById<TextView>(R.id.row_id_tv).text = currentItem.id.toString()
+        holder.itemView.findViewById<TextView>(R.id.row_id_tv).text = position.plus(1).toString()
         if(currentItem.alarmName == ""){
             holder.itemView.findViewById<TextView>(R.id.alarm_name).text = "Alarm ${currentItem.id}"
         }else{
@@ -94,7 +97,11 @@ class ListAdapter(private val clickListener: (id: Int) -> Unit, private val swit
         switchButton.isChecked = currentItem.active
 
         switchButton.setOnCheckedChangeListener{ _, isChecked ->
-            switchListener.invoke(currentItem.id, isChecked)
+            if (isChecked) {
+                switchListener.invoke(currentItem.id, true)
+            } else {
+                switchListener.invoke(currentItem.id, false)
+            }
         }
 
     }
