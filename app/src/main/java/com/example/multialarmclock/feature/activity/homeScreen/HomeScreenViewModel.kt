@@ -31,6 +31,7 @@ class HomeScreenViewModel(private val alarmRepository: AlarmRepository): AlarmAp
     fun deleteAlarm(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             alarmRepository.deleteAlarm(id)
+            getLastSavedAlarm()
             Log.d("AlarmViewModel", "Deleting alarm")
         }
     }

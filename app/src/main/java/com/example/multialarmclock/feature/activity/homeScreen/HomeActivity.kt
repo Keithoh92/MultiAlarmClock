@@ -7,12 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
-import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,57 +27,32 @@ class HomeActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<HomeScreenViewModel>()
 
-    //Setup for last used cardview
-    private lateinit var daysChosen: TextView
-    private lateinit var onOffSignal: TextView
-    private lateinit var range: TextView
-    private lateinit var interval: TextView
-    private lateinit var setButton: Button
-    private lateinit var editButton: Button
-    private lateinit var switchButton: SwitchCompat
-
-    private lateinit var cvBottomRight:CardView
-
     private var menu: Menu? = null
-
-    private var toolbar: Toolbar? = null
 
     private val adapter = ListAdapter (
         { id ->
             viewModel.deleteAlarm(id)
-            viewModel.getLastSavedAlarm()
-            viewModel.readAllData
         },
         { id, active ->
             viewModel.updateActiveState(id, active)
         }
     )
 
-    private val recyclerView:RecyclerView by lazy { findViewById(R.id.recyclerview) }
-
     @OptIn(InternalCoroutinesApi::class)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_main)
+        val view = binding.root
+        setContentView(view)
 
-        binding.mytoolbar
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.mytoolbar)
 
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(applicationContext)
-        addSeparatorDecorationToRecyclerView()
-
+        initialiseRecyclerView()
         initialiseViewModel()
+        initialiseClickListeners()
         setupObservers()
-
         setOnItemTouchHelper()
-
-        intitialiseViews()
-
-        cvBottomRight.setOnClickListener { openAlarmBuilder() }
-
     }
 
     override fun onResume() {
@@ -89,7 +60,16 @@ class HomeActivity : AppCompatActivity() {
         initialiseViewModel()
     }
 
-    @OptIn(InternalCoroutinesApi::class)
+    private fun initialiseRecyclerView() {
+        binding.recyclerview.adapter = adapter
+        binding.recyclerview.layoutManager = LinearLayoutManager(applicationContext)
+        addSeparatorDecorationToRecyclerView()
+    }
+
+    private fun initialiseClickListeners() {
+        binding.cardviewBottomRight.setOnClickListener { openAlarmBuilder() }
+    }
+
     private fun setupObservers() {
         viewModel.readAllData.observe(this) { alarm ->
             adapter.setData(alarm)
@@ -102,23 +82,23 @@ class HomeActivity : AppCompatActivity() {
 
     private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmDao>) {
         if(lastCreatedAlarm.isNotEmpty()) {
-            daysChosen.text = lastCreatedAlarm[0].daysSelected
-            onOffSignal.text = if (lastCreatedAlarm[0].active) ":ON" else ":OFF"
+            binding.daysChosen.text = lastCreatedAlarm[0].daysSelected
+            binding.onOffSignal.text = if (lastCreatedAlarm[0].active) ":ON" else ":OFF"
             val st = lastCreatedAlarm[0].startTime
             val et = lastCreatedAlarm[0].endTime
-            range.text = "Range: $st-$et"
+            binding.range.text = "Range: $st-$et"
             if (lastCreatedAlarm.get(0).interval == 60) {
-                interval.text = "Set Every hour"
+                binding.interval.text = "Set Every hour"
             } else {
-                interval.text = "Set Every " + lastCreatedAlarm.get(0).interval + " mins"
+                binding.interval.text = "Set Every " + lastCreatedAlarm.get(0).interval + " mins"
             }
             Log.d("MainAct", lastCreatedAlarm.get(0).daysSelected)
         }else {
-            daysChosen.text = "No Alarms Set"
+            binding.daysChosen.text = "No Alarms Set"
             val st = "N/A"
             val et = "N/A"
-            range.text = "Range: N/a"
-            interval.text = "N/A"
+            binding.range.text = "Range: N/a"
+            binding.interval.text = "N/A"
         }
     }
 
@@ -128,7 +108,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun addSeparatorDecorationToRecyclerView() {
-        recyclerView.addItemDecoration(DividerItemDecoration(
+        binding.recyclerview.addItemDecoration(DividerItemDecoration(
             applicationContext, LinearLayoutManager.VERTICAL
         ))
     }
@@ -229,7 +209,7 @@ class HomeActivity : AppCompatActivity() {
             }
 
         }).apply {
-            attachToRecyclerView(recyclerView)
+            attachToRecyclerView(binding.recyclerview)
         }
 
     }
@@ -241,33 +221,6 @@ class HomeActivity : AppCompatActivity() {
     private fun openAlarmBuilder() {
         val startAlarmBuilderActivity = Intent(this, BuildIntervalAlarmActivity::class.java)
         startActivity(startAlarmBuilderActivity)
-    }
-
-    private fun intitialiseViews() {
-        val cardviewTopLeft = findViewById<CardView>(R.id.cardview_top_left)
-        val cardviewTopRight = findViewById<CardView>(R.id.cardview_top_right)
-        val cardviewBottomLeft = findViewById<CardView>(R.id.cardview_top_right)
-        cvBottomRight = findViewById(R.id.cardview_bottom_right)
-
-        daysChosen = findViewById<TextView>(R.id.days_chosen)
-        onOffSignal = findViewById<TextView>(R.id.on_off_signal)
-        range = findViewById<TextView>(R.id.range)
-        interval = findViewById<TextView>(R.id.go_off_times)
-        editButton = findViewById(R.id.edit_button)
-        setButton = findViewById(R.id.set_button)
-
-        binding.cardviewTopLeftTv
-        binding.topRightCardviewTv
-        binding.cardviewBottomLeftTv
-        binding.cardviewBottomRight
-
-        binding.setButton
-        binding.editButton
-        binding.daysChosen
-        binding.divider
-        binding.divider2
-        binding.range
-        binding.goOffTimes
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
