@@ -82,23 +82,26 @@ class HomeActivity : AppCompatActivity() {
 
     private fun populateFirstCardViewWithLastCreatedAlarm(lastCreatedAlarm: List<BuildNewAlarmDao>) {
         if(lastCreatedAlarm.isNotEmpty()) {
-            binding.daysChosen.text = lastCreatedAlarm[0].daysSelected
-            binding.onOffSignal.text = if (lastCreatedAlarm[0].active) ":ON" else ":OFF"
-            val st = lastCreatedAlarm[0].startTime
-            val et = lastCreatedAlarm[0].endTime
-            binding.range.text = "Range: $st-$et"
-            if (lastCreatedAlarm.get(0).interval == 60) {
-                binding.interval.text = "Set Every hour"
+            val daysSelected = lastCreatedAlarm.first().daysSelected
+            val startTime = lastCreatedAlarm.first().startTime
+            val endTime = lastCreatedAlarm.first().endTime
+            val interval = lastCreatedAlarm.first().interval
+            val isActive = lastCreatedAlarm.first().active
+
+            binding.daysChosen.text = daysSelected
+            binding.onOffSignal.text = if (isActive) getString(R.string.on) else getString(R.string.off)
+            binding.range.text = getString(R.string.range_tv, startTime, endTime)
+
+            binding.interval.text = if (interval == 60) {
+                getString(R.string.interval_default_tv)
             } else {
-                binding.interval.text = "Set Every " + lastCreatedAlarm.get(0).interval + " mins"
+                getString(R.string.interval_tv, interval.toString())
             }
-            Log.d("MainAct", lastCreatedAlarm.get(0).daysSelected)
+            Log.d("MainAct", daysSelected)
         }else {
-            binding.daysChosen.text = "No Alarms Set"
-            val st = "N/A"
-            val et = "N/A"
-            binding.range.text = "Range: N/a"
-            binding.interval.text = "N/A"
+            binding.daysChosen.text = getString(R.string.no_alarms)
+            binding.range.text = getString(R.string.range_not_available)
+            binding.interval.text = getString(R.string.not_available)
         }
     }
 
@@ -205,13 +208,10 @@ class HomeActivity : AppCompatActivity() {
                 else if (viewHolder.itemView.scrollX < 0) {
                     viewHolder.itemView.scrollTo(0, 0)
                 }
-
             }
-
         }).apply {
             attachToRecyclerView(binding.recyclerview)
         }
-
     }
 
     private fun dpToPx(dpValue: Float, context: Context): Int {
@@ -229,5 +229,4 @@ class HomeActivity : AppCompatActivity() {
         this.menu = menu
         return true
     }
-
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import com.example.multialarmclock.R
 import com.example.multialarmclock.data.BuildNewAlarmDao
 import com.example.multialarmclock.databinding.FragmentAlarmIntervalBuilderBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -40,10 +41,6 @@ class BuildIntervalAlarmFragment : Fragment() {
     private lateinit var currentRingtone: Uri
     var chosenRTUri: Uri?=null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,36 +48,39 @@ class BuildIntervalAlarmFragment : Fragment() {
     ): View {
         binding = FragmentAlarmIntervalBuilderBinding.inflate(layoutInflater)
 
-        binding.intervalPicker.minValue = 0
-        binding.intervalPicker.maxValue = 60
-        binding.intervalPicker.setFormatter {
-            String.format("%02d", it)
-        }
-
         setupObserver()
+        initialiseClickListeners()
+        setupIntervalPicker()
+        setupRingtoneManager()
 
-        onClickTime(binding.root)
+        return binding.root
+    }
 
+    private fun setupRingtoneManager() {
         currentRingtone = RingtoneManager.getActualDefaultRingtoneUri(activity, RingtoneManager.TYPE_ALARM)
 
         val ringtoneDefault = RingtoneManager.getRingtone(activity, currentRingtone)
         val rt1 = ringtoneDefault.getTitle(activity)
         Log.d("RT", rt1.toString())
 
-        binding.ringtoneTv.text = "Current:\n"+rt1.toString()
+        binding.ringtoneTv.text = getString(R.string.ringtone_tv, rt1.toString())
+    }
 
-        initialiseClickListeners()
-
-        return binding.root
+    private fun setupIntervalPicker() {
+        binding.intervalPicker.minValue = 0
+        binding.intervalPicker.maxValue = 60
+        binding.intervalPicker.setFormatter { String.format("%02d", it) }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun initialiseClickListeners() {
+        setupTimePickerListeners()
+
         binding.playButton.setOnClickListener{
             if(chosenRingtone == null){
                 ringtoneDefault.play()
             }else{
-                chosenRingtone!!.play()
+                chosenRingtone?.play()
             }
             binding.playButton.visibility = View.INVISIBLE
             binding.stopButton.visibility = View.VISIBLE
@@ -90,19 +90,19 @@ class BuildIntervalAlarmFragment : Fragment() {
             if(chosenRingtone == null){
                 ringtoneDefault.stop()
             }else{
-                chosenRingtone!!.stop()
+                chosenRingtone?.stop()
             }
             binding.stopButton.visibility = View.INVISIBLE
             binding.playButton.visibility = View.VISIBLE
         }
 
-        var getResult =
+        val getResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 if(it.resultCode == Activity.RESULT_OK){
-                    chosenRTUri = it!!.data!!.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    chosenRTUri = it?.data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
                     val chosenRingtone = RingtoneManager.getRingtone(activity, chosenRTUri)
                     val rt1 = chosenRingtone.getTitle(activity)
-                    binding.ringtoneTv.text = "Current:\n"+rt1.toString()
+                    binding.ringtoneTv.text = getString(R.string.ringtone_tv, rt1.toString())
                 }
             }
 
@@ -122,6 +122,55 @@ class BuildIntervalAlarmFragment : Fragment() {
             } else {
                 Toast.makeText(activity, "You have not selected a Alarm StartTime Yet", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun setupTimePickerListeners() {
+        binding.startTimePicker.hour = 8
+        binding.startTimePicker.minute = 0
+        binding.endTimePicker.hour = 9
+        binding.endTimePicker.minute = 0
+
+        binding.startTimeTv.text = getString(R.string.start_time_tv)
+        binding.endTimeTv.text = getString(R.string.end_time_tv)
+
+        binding.startTimePicker.setIs24HourView(true)
+        binding.startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            val min1 = if (minute < 10) "00" else minute
+            val startTimeMsg = "Start Time: $hour:$min1 $am_pm"
+            startTimeTemp = "$hour:$min1 $am_pm"
+            binding.startTimeTv.text = startTimeMsg
+        }
+
+        binding.endTimePicker.setIs24HourView(true)
+        binding.endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
+            var am_pm = ""
+            //AM_PM Decider Logic
+            when {hour == 0 -> { hour += 12
+                am_pm = "AM"
+            }
+                hour == 12 -> am_pm = "PM"
+                hour > 12 -> { hour -= 12
+                    am_pm = "PM"
+                }
+                else -> am_pm = "AM"
+            }
+            val min1 = if (minute < 10) "00" else minute
+            val endTimeMsg = "End Time: $hour:$min1 $am_pm"
+            endTimeTemp = "$hour:$min1 $am_pm"
+            binding.endTimeTv.text = endTimeMsg
         }
     }
 
@@ -164,88 +213,38 @@ class BuildIntervalAlarmFragment : Fragment() {
         return !(TextUtils.isEmpty(usersAlarmName) && alarmDays.isEmpty() && TextUtils.isEmpty(startTime) && TextUtils.isEmpty(endTime) && interval == null)
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun onClickTime(root: View) {
-
-        binding.startTimePicker.hour = 8
-        binding.startTimePicker.minute = 0
-        binding.endTimePicker.hour = 9
-        binding.endTimePicker.minute = 0
-
-        binding.startTimeTv.text = "Start Time: 8:00 AM"
-        binding.endTimeTv.text = "End Time: 9:00 AM"
-
-        binding.startTimePicker.setIs24HourView(true)
-        binding.startTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
-            var am_pm = ""
-            //AM_PM Decider Logic
-            when {hour == 0 -> { hour += 12
-                am_pm = "AM"
-            }
-                hour == 12 -> am_pm = "PM"
-                hour > 12 -> { hour -= 12
-                    am_pm = "PM"
-                }
-                else -> am_pm = "AM"
-            }
-            val min1 = if (minute < 10) "00" else minute
-            val startTimeMsg = "Start Time: $hour:$min1 $am_pm"
-            startTimeTemp = "$hour:$min1 $am_pm"
-            binding.startTimeTv.text = startTimeMsg
-        }
-
-        binding.endTimePicker.setIs24HourView(true)
-        binding.endTimePicker.setOnTimeChangedListener { _,  hour, minute -> var hour = hour
-            var am_pm = ""
-            //AM_PM Decider Logic
-            when {hour == 0 -> { hour += 12
-                am_pm = "AM"
-            }
-                hour == 12 -> am_pm = "PM"
-                hour > 12 -> { hour -= 12
-                    am_pm = "PM"
-                }
-                else -> am_pm = "AM"
-            }
-            val min1 = if (minute < 10) "00" else minute
-            val endTimeMsg = "End Time: $hour:$min1 $am_pm"
-            endTimeTemp = "$hour:$min1 $am_pm"
-            binding.endTimeTv.text = endTimeMsg
-        }
-    }
-
-    fun getCheckedDays(): String {
+    private fun getCheckedDays(): String {
         daysSelected = arrayListOf()
-        if(binding.cbDay1.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay1.text.toString())
+        if (binding.cbDay1.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay1.text.toString())
             daysSelected.add("Mon")
         }
-        if(binding.cbDay2.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay2.text.toString())
+        if (binding.cbDay2.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay2.text.toString())
             daysSelected.add("Tue")
         }
-        if(binding.cbDay3.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay3.text.toString())
+        if (binding.cbDay3.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay3.text.toString())
             daysSelected.add("Wed")
         }
-        if(binding.cbDay4.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay4.text.toString())
+        if (binding.cbDay4.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay4.text.toString())
             daysSelected.add("Thu")
         }
-        if(binding.cbDay5.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay5.text.toString())
+        if (binding.cbDay5.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay5.text.toString())
             daysSelected.add("Fri")
         }
-        if(binding.cbDay6.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay6.text.toString())
+        if (binding.cbDay6.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay6.text.toString())
             daysSelected.add("Sat")
         }
-        if(binding.cbDay7.isChecked){
-            Log.d("DaysCheccked: ", binding.cbDay7.text.toString())
+        if (binding.cbDay7.isChecked) {
+            Log.d("DaysChecked: ", binding.cbDay7.text.toString())
             daysSelected.add("Sun")
         }
         var separator = ""
-        var sb = StringBuilder()
+        val sb = StringBuilder()
         for (i in daysSelected.indices){
             sb.append(separator+daysSelected[i])
             separator = ","//MON,TUES
