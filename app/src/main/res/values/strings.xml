@@ -105,4 +105,14 @@
     <string name="ringtone_tv">Current:\n %s</string>
     <string name="start_time_tv">Start Time: 8:00 AM</string>
     <string name="end_time_tv">End Time: 9:00 AM</string>
+    <string name="start_time_msg_on_change">Start Time: %s:%s %s</string>
+    <string name="end_time_msg_on_change">End Time: %s:%s %s</string>
+
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Fri</string>
+    <string name="friday">Thu</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
 </resources>
